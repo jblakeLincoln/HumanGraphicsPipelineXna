@@ -11,12 +11,23 @@ using Microsoft.Xna.Framework.Media;
 
 namespace HumanGraphicsPipelineXna
 {
-    class Scene
+    abstract class Scene
     {
         protected Vector2[] trianglePoints = new Vector2[3];
         protected Vector2[] normalisedTrianglePoints = new Vector2[3];
+        protected Square[] triangleSquares = new Square[3];
+        protected Line[] triangleLines = new Line[3]; //AB, BC, CA
 
+        Texture2D gridLine;
+        Texture2D windowSpaceLine;
         protected Button buttonNext;
+        protected Button buttonPrevious;
+        protected Button buttonPlay;
+
+        protected int animationCounter = 0;
+        protected int animationCounterLimit = 0;
+
+        bool animating = false;
 
         protected enum State
         {
@@ -30,73 +41,131 @@ namespace HumanGraphicsPipelineXna
 
         public Scene()
         {
-            buttonNext = new Button("Next", Fonts.font14, new Vector2(30, 30), new Vector2(Globals.viewport.X - 40, Globals.viewport.Y - 40), Color.DarkOliveGreen);
-        }
-
-        protected void DrawGrid(SpriteBatch spriteBatch)
-        {
-            Texture2D gridLine = new Texture2D(Globals.graphicsDevice, 1, 1, false, SurfaceFormat.Color);
+            gridLine = new Texture2D(Globals.graphicsDevice, 1, 1, false, SurfaceFormat.Color);
             Color[] pixels = new Color[1];
             for (int i = 0; i < 1; i++)
                 pixels[i] = new Color(0, 0, 0, 100);
 
             gridLine.SetData<Color>(pixels);
 
-            for (int i = 0; i <= Globals.viewportWidth/2; i++)
-            {
-                spriteBatch.Draw(gridLine, new Rectangle(0, i * ((int)Globals.viewportHeight / 24), (int)Globals.viewportWidth, 1), Color.White);
-                //DrawLineBetweenTwoPoints(spriteBatch, new Vector2(0, i * (GraphicsDevice.Viewport.Height / 24)), new Vector2(GraphicsDevice.Viewport.Width, i * (GraphicsDevice.Viewport.Height / 24)), Vector2.Zero,Color.Black);
-            }
-
-            for (int i = 0; i <= Globals.viewportHeight/2; i++)
-            {
-                spriteBatch.Draw(gridLine, new Rectangle(i * ((int)Globals.viewportWidth / 40), 0, 1, (int)Globals.viewportHeight), Color.White);
-                //DrawLineBetweenTwoPoints(spriteBatch, new Vector2(i * (GraphicsDevice.Viewport.Height / 24), 0), new Vector2(i * (GraphicsDevice.Viewport.Height / 24), GraphicsDevice.Viewport.Height), Vector2.Zero, Color.Black);
-            }
-
-            gridLine = new Texture2D(Globals.graphicsDevice, 1, 1, false, SurfaceFormat.Color);
+            windowSpaceLine = new Texture2D(Globals.graphicsDevice, 1, 1, false, SurfaceFormat.Color);
             pixels[0] = new Color(0, 0, 0, 255);
+            windowSpaceLine.SetData<Color>(pixels);
 
-            spriteBatch.Draw(gridLine, new Rectangle(Globals.viewportWidth / 2 - 2, 0, 4, Globals.viewportHeight), Color.White);
-            spriteBatch.Draw(gridLine, new Rectangle(0, Globals.viewportHeight / 2 - 2, (Globals.viewportWidth), 4), Color.White);
-
-            gridLine.SetData<Color>(pixels);
+            buttonNext = new Button(">", Fonts.font14, new Vector2(30, 30), new Vector2(Globals.viewport.X - 40, Globals.viewport.Y - 40), Color.DarkOliveGreen);
+            buttonPrevious = new Button("<", Fonts.font14, new Vector2(30, 30), new Vector2(Globals.viewport.X - 100, Globals.viewport.Y - 40), Color.DarkOliveGreen);
+            buttonPlay = new Button("||", Fonts.font14, new Vector2(30, 30), new Vector2(Globals.viewport.X - 70, Globals.viewport.Y - 40), Color.DarkOliveGreen);
+            
         }
 
         public virtual void Update(GameTime gameTime)
-        { 
-        
+        {
+            StateChanges(gameTime);
+
+            if (buttonPlay.IsClicked())
+                animating = !animating;
+
+            if (animating && animationCounter < animationCounterLimit)
+                animationCounter++;
+            else if (animationCounter >= animationCounterLimit)
+                animating = false;
+
+            if (!animating)
+            {
+                if (buttonNext.IsClicked() && animationCounter < animationCounterLimit)
+                    animationCounter++;
+                if (buttonPrevious.IsPressed())
+                    animationCounter--;
+            }
         }
+
+        protected abstract void LastTrianglePointPlaced(GameTime gameTime);
+
+        private void StateChanges(GameTime gameTime)
+        {
+            if (Inputs.MouseState.LeftButton == ButtonState.Released && Inputs.MouseStatePrevious.LeftButton == ButtonState.Pressed)
+            {
+                if (state == State.PickPoint1)
+                {
+                    trianglePoints[0] = new Vector2(Inputs.MouseState.X, Inputs.MouseState.Y);
+                    triangleSquares[0] = new Square(new Vector2(Inputs.MouseState.X - 5, Inputs.MouseState.Y - 5), new Vector2(10, 10), Color.Green);
+                    state = State.PickPoint2;
+                }
+                else if (state == State.PickPoint2)
+                {
+                    trianglePoints[1] = new Vector2(Inputs.MouseState.X, Inputs.MouseState.Y);
+                    triangleSquares[1] = new Square(new Vector2(Inputs.MouseState.X - 5, Inputs.MouseState.Y - 5), new Vector2(10, 10), Color.Green);
+                    state = State.PickPoint3;
+                }
+                else if (state == State.PickPoint3)
+                {
+                    trianglePoints[2] = new Vector2(Inputs.MouseState.X, Inputs.MouseState.Y);
+                    triangleSquares[2] = new Square(new Vector2(Inputs.MouseState.X - 5, Inputs.MouseState.Y - 5), new Vector2(10, 10), Color.Green);
+
+                    LastTrianglePointPlaced(gameTime);
+
+                    triangleLines[0] = new Line(trianglePoints[0], trianglePoints[1], Color.Black, 1);
+                    triangleLines[1] = new Line(trianglePoints[1], trianglePoints[2], Color.Black, 1);
+                    triangleLines[2] = new Line(trianglePoints[2], trianglePoints[0], Color.Black, 1);
+
+                    state = State.Animate;
+                }
+            }
+        }
+
+        protected void DrawGrid(SpriteBatch spriteBatch)
+        {
+            for (int i = 0; i <= (Globals.viewportHeight/Globals.pixelSize); i++)
+                spriteBatch.Draw(gridLine, new Rectangle(0, i * (Globals.viewportHeight / (Globals.viewportHeight/Globals.pixelSize)), Globals.viewportWidth, 1), Color.White);
+
+            for (int i = 0; i <= (Globals.viewportWidth / Globals.pixelSize); i++)
+                spriteBatch.Draw(gridLine, new Rectangle(i * (Globals.viewportWidth / (Globals.viewportWidth / Globals.pixelSize)), 0, 1, Globals.viewportHeight), Color.White);        
+
+            spriteBatch.Draw(windowSpaceLine, new Rectangle(Globals.viewportWidth / 2 - 2, 0, 4, Globals.viewportHeight), Color.White);
+            spriteBatch.Draw(windowSpaceLine, new Rectangle(0, Globals.viewportHeight / 2 - 2, (Globals.viewportWidth), 4), Color.White);
+        }
+
+        
 
         public virtual void Draw(SpriteBatch spriteBatch) 
         {
+            DrawGrid(spriteBatch);
+
+            for (int i = 0; i < 3; i++)
+            {
+                if (trianglePoints[i] != Vector2.Zero)
+                {
+                    triangleSquares[i].Draw(spriteBatch);
+
+                    float normalisedX = (trianglePoints[i].X - 0) / ((Globals.viewportWidth / 2) - 0) - 0.5f * 2;
+                    float normalisedY = (trianglePoints[i].Y - 0) / ((Globals.viewportHeight / 2) - 0) - 0.5f * 2;
+
+                    normalisedTrianglePoints[i] = new Vector2(normalisedX, normalisedY);
+                    spriteBatch.DrawString(Fonts.smallFont, normalisedTrianglePoints[i].X.ToString() + ", " + normalisedTrianglePoints[i].Y.ToString(), new Vector2(trianglePoints[i].X - 10, trianglePoints[i].Y - 15), Color.White);
+                }
+            }
+
+            if (trianglePoints[2] != Vector2.Zero)
+            {
+                for (int i = 0; i < 3; i++)
+                    triangleLines[i].Draw(spriteBatch);
+                ActionOnTriangleDraw(spriteBatch);
+            }
+
+
             if (state == State.Animate)
+            {
+                buttonPrevious.Draw(spriteBatch);
+                buttonPlay.Draw(spriteBatch);
                 buttonNext.Draw(spriteBatch);
+
+            }
+
+            DrawText(spriteBatch);
         }
 
-        protected void DrawSquare(SpriteBatch spriteBatch, Vector2 pos, Vector2 size, Color col)
-        {
-            Texture2D square = new Texture2D(Globals.graphicsDevice, 1, 1, false, SurfaceFormat.Color);
-            Color[] pixels = new Color[1];
-            for (int i = 0; i < 1; i++)
-                pixels[i] = col;
-            square.SetData<Color>(pixels);
+        protected abstract void ActionOnTriangleDraw(SpriteBatch spriteBatch);
 
-            spriteBatch.Draw(square, new Rectangle((int)pos.X, (int)pos.Y, (int)size.X, (int)size.Y), Color.White);
-
-        }
-
-        protected void DrawLineBetweenTwoPoints(SpriteBatch spriteBatch, Vector2 p1, Vector2 p2, Vector2 offset, Color col, float thickness = 1f)
-        {
-            Texture2D pixel = new Texture2D(Globals.graphicsDevice, 1, 1);
-            pixel.SetData(new Color[] { Color.White });
-
-            Vector2 direction = p2 - p1;
-            float length = direction.Length();
-            float angle = (float)Math.Atan2(direction.Y, direction.X);
-            spriteBatch.Draw(pixel, new Vector2(p1.X + offset.X, p1.Y + offset.Y), null, col, angle, new Vector2(0.0f, 0.5f), new Vector2(length, thickness), SpriteEffects.None, 1.0f);
-        }
+        protected virtual void DrawText(SpriteBatch spriteBatch) {}
     }
-
-    
 }

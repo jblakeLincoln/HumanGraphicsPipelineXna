@@ -16,7 +16,7 @@ namespace HumanGraphicsPipelineXna
         Texture2D tex;
         Color[] pixels = {Color.Black};
 
-        Vector2 position;
+        public Vector2 position { get;private set;}
         Vector2 size;
         public Square(Vector2 pos, Vector2 sizeIn, Color col)
         {
@@ -31,7 +31,7 @@ namespace HumanGraphicsPipelineXna
 
         public virtual void Draw(SpriteBatch spriteBatch)
         {
-            spriteBatch.Draw(tex, new Rectangle((int)position.X, (int)position.Y, (int)size.X, (int)size.Y), Color.White);
+            spriteBatch.Draw(tex, new Rectangle((int)position.X, (int)position.Y, (int)size.X, (int)size.Y), pixels[0]);
         }
     }
 }

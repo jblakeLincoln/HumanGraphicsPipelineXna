@@ -37,7 +37,7 @@ namespace HumanGraphicsPipelineXna
         {
             Globals.graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
-
+            IsFixedTimeStep = false;
             Globals.Init();
         }
 
@@ -50,7 +50,6 @@ namespace HumanGraphicsPipelineXna
         protected override void Initialize()
         {
             // TODO: Add your initialization logic here
-
             IsMouseVisible = true;
 
            // Inputs.MouseState = Mouse.GetState();
@@ -65,9 +64,9 @@ namespace HumanGraphicsPipelineXna
         {
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
-
             Fonts.font14 = Content.Load<SpriteFont>("Font14");
             Fonts.smallFont = Content.Load<SpriteFont>("SmallFont");
+            Fonts.arial14 = Content.Load<SpriteFont>("Arial14");
             
             buttonTriangleFilling = new Button("Triangle filling", Fonts.font14, new Vector2(150, 50), new Vector2(10, 10), Color.Red);
             buttonHalfSpace = new Button("Half-space", Fonts.font14, new Vector2(150, 50), new Vector2(180, 10), Color.Red);
@@ -129,7 +128,8 @@ namespace HumanGraphicsPipelineXna
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
-            spriteBatch.Begin();
+            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.LinearClamp, DepthStencilState.None, RasterizerState.CullNone);
+
             if (menuState != MenuState.None)
             {
                 if (menuState == MenuState.Main)
@@ -140,10 +140,12 @@ namespace HumanGraphicsPipelineXna
 
             if (scene != null)
                 scene.Draw(spriteBatch);
+
             spriteBatch.End();
             base.Draw(gameTime);
         }
 
+        #region Menu drawing
         private void DrawMainMenu(SpriteBatch spriteBatch)
         {
             buttonTriangleFilling.Draw(spriteBatch);
@@ -154,5 +156,6 @@ namespace HumanGraphicsPipelineXna
             buttonHalfSpace.Draw(spriteBatch);
             buttonBarycentric.Draw(spriteBatch);
         }
+        #endregion
     }
 }

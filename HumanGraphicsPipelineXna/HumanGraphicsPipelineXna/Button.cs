@@ -46,10 +46,27 @@ namespace HumanGraphicsPipelineXna
             font = f;
         }
 
+        /// <summary>
+        /// Detects mouse click on release
+        /// </summary>
         public bool IsClicked()
         {
             if (new Rectangle((int)position.X, (int)position.Y, (int)dimensions.X, (int)dimensions.Y).Contains(Inputs.MouseState.X, Inputs.MouseState.Y) &&
                 Inputs.MouseState.LeftButton == ButtonState.Released && Inputs.MouseStatePrevious.LeftButton == ButtonState.Pressed)
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Detects continued mouse click (held click)
+        /// </summary>
+        public bool IsPressed()
+        {
+            if (new Rectangle((int)position.X, (int)position.Y, (int)dimensions.X, (int)dimensions.Y).Contains(Inputs.MouseState.X, Inputs.MouseState.Y) &&
+                Inputs.MouseState.LeftButton == ButtonState.Pressed)
             {
                 return true;
             }
