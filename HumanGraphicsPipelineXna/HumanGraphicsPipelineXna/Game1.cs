@@ -16,11 +16,7 @@ namespace HumanGraphicsPipelineXna
     /// </summary>
     public class Game1 : Microsoft.Xna.Framework.Game
     {
-        GraphicsDeviceManager graphics;
-        SpriteBatch spriteBatch;
-        SpriteFont font;
-        SpriteFont smallFont;
-        
+        SpriteBatch spriteBatch;       
 
         Button buttonHalfSpace;
         Button buttonBarycentric;
@@ -35,20 +31,14 @@ namespace HumanGraphicsPipelineXna
             None,
         }
 
-        enum ScreenState
-        { 
-            HalfSpace,
-            Barycentric,
-            None,
-        }
-
         MenuState menuState = MenuState.Main;
-        ScreenState screenState = ScreenState.None;
 
         public Game1()
         {
-            graphics = new GraphicsDeviceManager(this);
+            Globals.graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
+
+            Globals.Init();
         }
 
         /// <summary>
@@ -76,11 +66,13 @@ namespace HumanGraphicsPipelineXna
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
-            font = Content.Load<SpriteFont>("SpriteFont1");
-            smallFont = Content.Load<SpriteFont>("SmallFont");
-            buttonTriangleFilling = new Button(graphics, "Triangle filling", font, new Vector2(150, 50), new Vector2(10, 10), Color.Red);
-            buttonHalfSpace = new Button(graphics, "Half-space", font, new Vector2(150, 50), new Vector2(180, 10), Color.Red);
-            buttonBarycentric = new Button(graphics, "Barycentric", font, new Vector2(150, 50), new Vector2(340, 10), Color.Red);
+            Fonts.font14 = Content.Load<SpriteFont>("Font14");
+            Fonts.smallFont = Content.Load<SpriteFont>("SmallFont");
+            
+            buttonTriangleFilling = new Button("Triangle filling", Fonts.font14, new Vector2(150, 50), new Vector2(10, 10), Color.Red);
+            buttonHalfSpace = new Button("Half-space", Fonts.font14, new Vector2(150, 50), new Vector2(180, 10), Color.Red);
+            buttonBarycentric = new Button("Barycentric", Fonts.font14, new Vector2(150, 50), new Vector2(340, 10), Color.Red);
+
             // TODO: use this.Content to load your game content here
         }
 
@@ -109,22 +101,19 @@ namespace HumanGraphicsPipelineXna
 
             if (menuState == MenuState.Main)
             {
-                if (buttonTriangleFilling.IsClicked(Inputs.MouseState, Inputs.MouseStatePrevious))
+                if (buttonTriangleFilling.IsClicked())
                     menuState = MenuState.TriangleFilling;
             }
             else if (menuState == MenuState.TriangleFilling)
             {
-                if (buttonHalfSpace.IsClicked(Inputs.MouseState, Inputs.MouseStatePrevious))
+                if (buttonHalfSpace.IsClicked())
                 {
-                    scene = new HalfSpace(GraphicsDevice, smallFont);
+                    scene = new HalfSpace();
                     menuState = MenuState.None;
-                    screenState = ScreenState.HalfSpace;
-                    Console.WriteLine("Choose first triangle point.");
                 }
-                else if (buttonBarycentric.IsClicked(Inputs.MouseState, Inputs.MouseStatePrevious))
+                else if (buttonBarycentric.IsClicked())
                 {
                     menuState = MenuState.None;
-                    screenState = ScreenState.Barycentric;
                 }
  
             }

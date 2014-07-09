@@ -22,7 +22,7 @@ namespace HumanGraphicsPipelineXna
 
         Vector2 textSize;
         Vector2 textCentre;
-        public Button(GraphicsDeviceManager g, string s, SpriteFont f, Vector2 dim, Vector2 pos, Color col)
+        public Button(string s, SpriteFont f, Vector2 dim, Vector2 pos, Color col)
         {
             text = s;
             dimensions = new Vector2(dim.X, dim.Y);
@@ -36,20 +36,20 @@ namespace HumanGraphicsPipelineXna
             }
             position = pos;
 
-            tex = new Texture2D(g.GraphicsDevice, (int)dim.X, (int)dim.Y, false, SurfaceFormat.Color);
+            tex = new Texture2D(Globals.graphics.GraphicsDevice, (int)dim.X, (int)dim.Y, false, SurfaceFormat.Color);
 
             tex.SetData<Color>(pixels);
 
             textSize = f.MeasureString(s);
-            textCentre = new Vector2(g.GraphicsDevice.Viewport.Width / 2, dim.Y);
+            textCentre = new Vector2(Globals.graphics.GraphicsDevice.Viewport.Width / 2, dim.Y);
 
             font = f;
         }
 
-        public bool IsClicked(MouseState mState, MouseState lState)
+        public bool IsClicked()
         {
-            if (new Rectangle((int)position.X, (int)position.Y, (int)dimensions.X, (int)dimensions.Y).Contains(mState.X, mState.Y) &&
-                mState.LeftButton == ButtonState.Released && lState.LeftButton == ButtonState.Pressed)
+            if (new Rectangle((int)position.X, (int)position.Y, (int)dimensions.X, (int)dimensions.Y).Contains(Inputs.MouseState.X, Inputs.MouseState.Y) &&
+                Inputs.MouseState.LeftButton == ButtonState.Released && Inputs.MouseStatePrevious.LeftButton == ButtonState.Pressed)
             {
                 return true;
             }
