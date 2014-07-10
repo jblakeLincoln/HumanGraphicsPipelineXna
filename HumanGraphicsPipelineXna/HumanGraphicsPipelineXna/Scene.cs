@@ -32,10 +32,10 @@ namespace HumanGraphicsPipelineXna
 
         protected enum State
         {
-            PickPoint1,
-            PickPoint2,
-            PickPoint3,
-            Animate,
+            PickPoint1=0,
+            PickPoint2=1,
+            PickPoint3=2,
+            Animate=3,
         }
 
         protected State state = State.PickPoint1;
@@ -127,30 +127,19 @@ namespace HumanGraphicsPipelineXna
         {
             if (Inputs.MouseState.LeftButton == ButtonState.Released && Inputs.MouseStatePrevious.LeftButton == ButtonState.Pressed)
             {
-                if (state == State.PickPoint1)
+                if ((int)state < 3)
                 {
-                    trianglePoints[0] = new Vector2(Inputs.MouseState.X, Inputs.MouseState.Y);
-                    triangleSquares[0] = new Square(new Vector2(Inputs.MouseState.X - 5, Inputs.MouseState.Y - 5), new Vector2(10, 10), Color.Green);
-                    state = State.PickPoint2;
+                    trianglePoints[(int)state] = new Vector2(Inputs.MouseState.X, Inputs.MouseState.Y);
+                    triangleSquares[(int)state] = new Square(new Vector2(Inputs.MouseState.X - 5, Inputs.MouseState.Y - 5), new Vector2(10, 10), Color.Green);
+                    state++;
                 }
-                else if (state == State.PickPoint2)
+                if ((int)state ==3)
                 {
-                    trianglePoints[1] = new Vector2(Inputs.MouseState.X, Inputs.MouseState.Y);
-                    triangleSquares[1] = new Square(new Vector2(Inputs.MouseState.X - 5, Inputs.MouseState.Y - 5), new Vector2(10, 10), Color.Green);
-                    state = State.PickPoint3;
-                }
-                else if (state == State.PickPoint3)
-                {
-                    trianglePoints[2] = new Vector2(Inputs.MouseState.X, Inputs.MouseState.Y);
-                    triangleSquares[2] = new Square(new Vector2(Inputs.MouseState.X - 5, Inputs.MouseState.Y - 5), new Vector2(10, 10), Color.Green);
-
                     LastTrianglePointPlaced(gameTime);
 
                     triangleLines[0] = new Line(trianglePoints[0], trianglePoints[1], Color.Black, 1);
                     triangleLines[1] = new Line(trianglePoints[1], trianglePoints[2], Color.Black, 1);
                     triangleLines[2] = new Line(trianglePoints[2], trianglePoints[0], Color.Black, 1);
-
-                    state = State.Animate;
                 }
             }
         }

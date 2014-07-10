@@ -77,6 +77,7 @@
     <Reference Include="System.Net" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Barycentric.cs" />
     <Compile Include="Button.cs" />
     <Compile Include="Fonts.cs" />
     <Compile Include="Globals.cs" />

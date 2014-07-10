@@ -11,12 +11,12 @@ using Microsoft.Xna.Framework.Media;
 
 namespace HumanGraphicsPipelineXna
 {
-    class HalfSpace : Scene
+    class Barycentric : Scene
     {
+
         List<List<bool>> listPixelCheck = new List<List<bool>>();
         List<List<Square>> listSquares = new List<List<Square>>();
         List<List<float[]>> listResults = new List<List<float[]>>();
-
         Vector2 minimum; // Minimum triangle X and Y.
         Vector2 maximum; // Maximum triangle X and Y.
         Vector2 check; // Point in px being checked.
@@ -24,12 +24,8 @@ namespace HumanGraphicsPipelineXna
         Vector2 pixelInBox; // Pixel within the bounding box at the current checking location.
         Square boundingBox;
 
-        // Halfspace checks
-        float v0;
-        float v1;
-        float v2;
 
-        public HalfSpace()
+        public Barycentric()
             : base()
         { 
         
@@ -37,9 +33,6 @@ namespace HumanGraphicsPipelineXna
 
         protected override void DerivedInit()
         {
-            v0 = 0;
-            v1 = 1;
-            v2 = 0;
             listPixelCheck = new List<List<bool>>();
             listSquares = new List<List<Square>>();
             listResults = new List<List<float[]>>();
@@ -63,11 +56,11 @@ namespace HumanGraphicsPipelineXna
             boundingBox = new Square(new Vector2(minimum.X, minimum.Y), new Vector2(maximum.X - minimum.X, maximum.Y - minimum.Y), new Color(255, 0, 0, 120));
         }
 
-        protected override void ActionOnTriangleDraw(SpriteBatch spriteBatch)
+        protected override void ActionOnTriangleDraw(Microsoft.Xna.Framework.Graphics.SpriteBatch spriteBatch)
         {
             boundingBox.Draw(spriteBatch);
 
-            
+
             if (listPixelCheck.Count == 0)
             {
                 int count = 0;
@@ -81,10 +74,9 @@ namespace HumanGraphicsPipelineXna
                     {
                         listPixelCheck[i].Add(false);
                         check = (new Vector2(minimum.X + (i * Globals.pixelSize) + (Globals.pixelSize / 2), minimum.Y + (j * Globals.pixelSize) + (Globals.pixelSize / 2)));
-                        bool inTri = IsInTriangle(check);
                         Color col;
 
-                        if (IsInTriangle(check))
+                        if (PerformBarycentric(check))
                         {
                             listPixelCheck[i][j] = true;
                             col = new Color(0, 120, 120, 180);
@@ -97,9 +89,9 @@ namespace HumanGraphicsPipelineXna
 
                         listSquares[i].Add(new Square(new Vector2(minimum.X + (i * Globals.pixelSize), minimum.Y + (j * Globals.pixelSize)), new Vector2(Globals.pixelSize, Globals.pixelSize), col));
                         listResults[i].Add(new float[3]);
-                        listResults[i][j][0] = v0;
-                        listResults[i][j][1] = v1;
-                        listResults[i][j][2] = v2;
+                        //listResults[i][j][0] = v0;
+                        //listResults[i][j][1] = v1;
+                        //listResults[i][j][2] = v2;
 
                         count++;
                     }
@@ -107,7 +99,7 @@ namespace HumanGraphicsPipelineXna
                 }
 
                 animationCounterLimit = (listPixelCheck.Count * listPixelCheck[0].Count);
-                bool b = IsInTriangle(check);
+                bool b = PerformBarycentric(check);
             }
         }
 
@@ -115,7 +107,7 @@ namespace HumanGraphicsPipelineXna
         {
 
             base.Draw(spriteBatch);
-            
+
 
             Vector2 normalisedScreen = Vector2.Normalize(new Vector2(Globals.viewport.X, Globals.viewport.Y));
 
@@ -141,20 +133,20 @@ namespace HumanGraphicsPipelineXna
                         listSquares[i][j].Draw(spriteBatch);
 
                         int y = 0;
-                        
+
                         count++;
                     }
                     if (breakNow)
                         break;
                 }
             }
-            
+
         }
 
         protected override void DrawText(SpriteBatch spriteBatch)
         {
             int y = 0;
-            Fonts.WriteStrokedLine(spriteBatch, Fonts.arial14, "Point A: " + normalisedTrianglePoints[0], new Vector2(10, y+=20), Color.White, Color.Black);
+            Fonts.WriteStrokedLine(spriteBatch, Fonts.arial14, "Point A: " + normalisedTrianglePoints[0], new Vector2(10, y += 20), Color.White, Color.Black);
             Fonts.WriteStrokedLine(spriteBatch, Fonts.arial14, "Point B: " + normalisedTrianglePoints[1], new Vector2(10, y += 20), Color.White, Color.Black);
             Fonts.WriteStrokedLine(spriteBatch, Fonts.arial14, "Point C: " + normalisedTrianglePoints[2], new Vector2(10, y += 20), Color.White, Color.Black);
 
@@ -162,17 +154,17 @@ namespace HumanGraphicsPipelineXna
 
             if (listResults.Count > 0)
             {
-
+                /*
                 Vector2 previous = GetPreviousValue(pixelInBox, listPixelCheck);
                 Console.WriteLine("Pixel: " + pixelInBox);
                 Console.WriteLine("PPP: " + previousPixelInBox);
                 Fonts.WriteStrokedLine(spriteBatch, Fonts.arial14, "Orient AB: " + listResults[(int)previous.X][(int)previous.Y][0], new Vector2(10, y += 20), Color.White, Color.Black);
                 Fonts.WriteStrokedLine(spriteBatch, Fonts.arial14, "Orient BC: " + listResults[(int)previous.X][(int)previous.Y][1], new Vector2(10, y += 20), Color.White, Color.Black);
                 Fonts.WriteStrokedLine(spriteBatch, Fonts.arial14, "Orient CA: " + listResults[(int)previous.X][(int)previous.Y][2], new Vector2(10, y += 20), Color.White, Color.Black);
+                */
             }
         }
 
-        // Gets previous pixel value in 2D array;
         protected Vector2 GetPreviousValue<T>(Vector2 vIn, List<List<T>> l)
         {
             // 1D representation of array
@@ -198,24 +190,25 @@ namespace HumanGraphicsPipelineXna
             return new Vector2(xx, yy);
         }
 
-        
-        protected bool IsInTriangle(Vector2 pointToCheck)
+        protected bool PerformBarycentric(Vector2 p)
         {
-            v0 = orient2d(trianglePoints[0], trianglePoints[1], pointToCheck);
-            v1 = orient2d(trianglePoints[1], trianglePoints[2], pointToCheck);
-            v2 = orient2d(trianglePoints[2], trianglePoints[0], pointToCheck);
+            Vector2 vs1 = new Vector2(trianglePoints[1].X - trianglePoints[0].X, trianglePoints[1].Y - trianglePoints[0].Y);
+            Vector2 vs2 = new Vector2(trianglePoints[2].X - trianglePoints[0].X, trianglePoints[2].Y - trianglePoints[0].Y);
 
-            if (v0 >= 0 && v1 >= 0 && v2 >= 0)
+            Vector2 q = new Vector2(p.X - trianglePoints[0].X, p.Y - trianglePoints[0].Y);
+
+            float s = (CrossProduct(q,vs2)) / CrossProduct(vs1, vs2);
+            float t = (CrossProduct(vs1, q)) / CrossProduct(vs1, vs2);
+
+            if (s >= 0 && t >= 0 && s + t <= 1)
                 return true;
-            else
-                return false;
+
+            return false;
         }
 
-
-        private float orient2d(Vector2 a, Vector2 b, Vector2 p) // a = input 1, b = input 2, p = point to check
+        protected float CrossProduct(Vector2 a, Vector2 b)
         {
-            return (b.X - a.X) * (p.Y - a.Y) - (b.Y - a.Y) * (p.X - a.X);
+            return a.X * b.Y - a.Y * b.X;
         }
-
     }
 }

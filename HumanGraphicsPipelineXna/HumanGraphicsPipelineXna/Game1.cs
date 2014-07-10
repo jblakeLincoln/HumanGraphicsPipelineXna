@@ -81,7 +81,7 @@ namespace HumanGraphicsPipelineXna
 
             buttonTriangleFilling.OnClick += (b) => menuState = MenuState.TriangleFilling;
             buttonHalfSpace.OnClick += (b) => { menuState = MenuState.None; scene = new HalfSpace(); };
-            buttonBarycentric.OnClick += (b) => menuState = MenuState.None;
+            buttonBarycentric.OnClick += (b) => { menuState = MenuState.None; scene = new Barycentric(); };
         }
 
         /// <summary>
@@ -105,11 +105,16 @@ namespace HumanGraphicsPipelineXna
             if (scene != null)
                 scene.Update(gameTime);
 
-            buttonTriangleFilling.Update(gameTime);
-            buttonHalfSpace.Update(gameTime);
-            buttonBarycentric.Update(gameTime);
-            //if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed)
-                //this.Exit();
+            switch (menuState)
+            {
+                case MenuState.Main:
+                    buttonTriangleFilling.Update(gameTime);
+                    break;
+                case MenuState.TriangleFilling:
+                    buttonHalfSpace.Update(gameTime);
+                    buttonBarycentric.Update(gameTime);
+                    break;
+            }
 
             base.Update(gameTime);
         }
@@ -124,12 +129,14 @@ namespace HumanGraphicsPipelineXna
 
             spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.LinearClamp, DepthStencilState.None, RasterizerState.CullNone);
 
-            if (menuState != MenuState.None)
+            switch(menuState)
             {
-                if (menuState == MenuState.Main)
+                case MenuState.Main:
                     DrawMainMenu(spriteBatch);
-                else if (menuState == MenuState.TriangleFilling)
+                    break;
+                case MenuState.TriangleFilling:
                     DrawTriangleFillingMenu(spriteBatch);
+                    break;
             }
 
             if (scene != null)
