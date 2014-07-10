@@ -15,22 +15,39 @@ namespace HumanGraphicsPipelineXna
     {
         List<List<bool>> listPixelCheck = new List<List<bool>>();
         List<List<Square>> listSquares = new List<List<Square>>();
+        List<List<float[]>> listResults = new List<List<float[]>>();
 
-        Vector2 minimum = Vector2.Zero; // Minimum triangle X and Y.
-        Vector2 maximum = Vector2.Zero; // Maximum triangle X and Y.
-        Vector2 check = Vector2.Zero; // Point in px being checked.
-        Vector2 pixelInBox = Vector2.Zero; // Pixel within the bounding box at the current checking location.
+        Vector2 minimum; // Minimum triangle X and Y.
+        Vector2 maximum; // Maximum triangle X and Y.
+        Vector2 check; // Point in px being checked.
+        Vector2 previousPixelInBox;
+        Vector2 pixelInBox; // Pixel within the bounding box at the current checking location.
         Square boundingBox;
 
         // Halfspace checks
-        float v0 = 0;
-        float v1 = 0;
-        float v2 = 0;
+        float v0;
+        float v1;
+        float v2;
 
         public HalfSpace()
             : base()
         { 
         
+        }
+
+        protected override void DerivedInit()
+        {
+            v0 = 0;
+            v1 = 1;
+            v2 = 0;
+            listPixelCheck = new List<List<bool>>();
+            listSquares = new List<List<Square>>();
+            listResults = new List<List<float[]>>();
+            minimum = Vector2.Zero; // Minimum triangle X and Y.
+            maximum = Vector2.Zero; // Maximum triangle X and Y.
+            check = Vector2.Zero; // Point in px being checked.
+            previousPixelInBox = Vector2.Zero;
+            pixelInBox = Vector2.Zero; // Pixel within the bounding box at the current checking location.
         }
 
         protected override void LastTrianglePointPlaced(GameTime gameTime)
@@ -54,11 +71,12 @@ namespace HumanGraphicsPipelineXna
             if (listPixelCheck.Count == 0)
             {
                 int count = 0;
+
                 for (int i = 0; i < (maximum.X - minimum.X) / Globals.pixelSize; i++)
                 {
                     listPixelCheck.Add(new List<bool>());
                     listSquares.Add(new List<Square>());
-
+                    listResults.Add(new List<float[]>());
                     for (int j = 0; j < (maximum.Y - minimum.Y) / Globals.pixelSize; j++)
                     {
                         listPixelCheck[i].Add(false);
@@ -78,6 +96,11 @@ namespace HumanGraphicsPipelineXna
                         }
 
                         listSquares[i].Add(new Square(new Vector2(minimum.X + (i * Globals.pixelSize), minimum.Y + (j * Globals.pixelSize)), new Vector2(Globals.pixelSize, Globals.pixelSize), col));
+                        listResults[i].Add(new float[3]);
+                        listResults[i][j][0] = v0;
+                        listResults[i][j][1] = v1;
+                        listResults[i][j][2] = v2;
+
                         count++;
                     }
                     count = 0;
@@ -104,8 +127,10 @@ namespace HumanGraphicsPipelineXna
                 {
                     for (int i = 0; i < listPixelCheck.Count; i++)
                     {
-                        if (count >= animationCounter)
+                        if (count > animationCounter)
                         {
+                            if (new Vector2(i, j) != pixelInBox)
+                                previousPixelInBox = new Vector2(pixelInBox.X, pixelInBox.Y);
                             breakNow = true;
                             check = new Vector2(minimum.X + (i * Globals.pixelSize) + (Globals.pixelSize / 2), minimum.Y + (j * Globals.pixelSize) + (Globals.pixelSize / 2));
                             pixelInBox.X = i;
@@ -114,6 +139,9 @@ namespace HumanGraphicsPipelineXna
                         }
 
                         listSquares[i][j].Draw(spriteBatch);
+
+                        int y = 0;
+                        
                         count++;
                     }
                     if (breakNow)
@@ -132,9 +160,14 @@ namespace HumanGraphicsPipelineXna
 
             y += 30;
 
-            Fonts.WriteStrokedLine(spriteBatch, Fonts.arial14, "Orient AB: " + v0, new Vector2(10, y += 20), Color.White, Color.Black);
-            Fonts.WriteStrokedLine(spriteBatch, Fonts.arial14, "Orient BC: " + v1, new Vector2(10, y += 20), Color.White, Color.Black);
-            Fonts.WriteStrokedLine(spriteBatch, Fonts.arial14, "Orient CA: " + v2, new Vector2(10, y += 20), Color.White, Color.Black);
+            if (listResults.Count > 0)
+            {
+                Console.WriteLine("Pixel: " + pixelInBox);
+                Console.WriteLine("PPP: " + previousPixelInBox);
+                Fonts.WriteStrokedLine(spriteBatch, Fonts.arial14, "Orient AB: " + listResults[(int)previousPixelInBox.X][(int)previousPixelInBox.Y][0], new Vector2(10, y += 20), Color.White, Color.Black);
+                Fonts.WriteStrokedLine(spriteBatch, Fonts.arial14, "Orient BC: " + listResults[(int)previousPixelInBox.X][(int)previousPixelInBox.Y][1], new Vector2(10, y += 20), Color.White, Color.Black);
+                Fonts.WriteStrokedLine(spriteBatch, Fonts.arial14, "Orient CA: " + listResults[(int)previousPixelInBox.X][(int)previousPixelInBox.Y][2], new Vector2(10, y += 20), Color.White, Color.Black);
+            }
         }
 
         

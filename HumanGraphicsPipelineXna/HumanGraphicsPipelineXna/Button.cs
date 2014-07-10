@@ -33,28 +33,37 @@ namespace HumanGraphicsPipelineXna
 
         TimeSpan pressTimer = TimeSpan.Zero;
 
+
         public Button(string s, SpriteFont f, Vector2 dim, Vector2 pos, Color col)
         {
             text = s;
             dimensions = new Vector2(dim.X, dim.Y);
-            Color[] pixels = new Color[(int)dim.X * (int)dim.Y];
-            for (int i = 0; i < dim.X; i++)
-            {
-                for (int j = 0; j < dim.Y; j++)
-                {
-                    pixels[i * (int)dim.Y + j] = new Color(col.R, col.G, col.B, col.A);
-                }
-            }
+            
             position = pos;
 
-            tex = new Texture2D(Globals.graphics.GraphicsDevice, (int)dim.X, (int)dim.Y, false, SurfaceFormat.Color);
-
-            tex.SetData<Color>(pixels);
+            SetColour(col);
 
             textSize = f.MeasureString(s);
             textCentre = new Vector2(Globals.graphics.GraphicsDevice.Viewport.Width / 2, dim.Y);
 
             font = f;
+        }
+
+        public void EmulateClick()
+        {
+            if (OnClick != null)
+                OnClick(this);
+        }
+
+        public void SetColour(Color col)
+        {
+        Color[] pixels = new Color[1];
+
+                    pixels[0] = new Color(col.R, col.G, col.B, col.A);
+
+            tex = new Texture2D(Globals.graphics.GraphicsDevice, 1, 1);
+
+            tex.SetData<Color>(pixels);
         }
 
         /// <summary>

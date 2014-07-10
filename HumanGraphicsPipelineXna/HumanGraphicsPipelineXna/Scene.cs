@@ -13,19 +13,20 @@ namespace HumanGraphicsPipelineXna
 {
     abstract class Scene
     {
-        protected Vector2[] trianglePoints = new Vector2[3];
-        protected Vector2[] normalisedTrianglePoints = new Vector2[3];
-        protected Square[] triangleSquares = new Square[3];
-        protected Line[] triangleLines = new Line[3]; //AB, BC, CA
+        protected Vector2[] trianglePoints;
+        protected Vector2[] normalisedTrianglePoints;
+        protected Square[] triangleSquares;
+        protected Line[] triangleLines;
 
         Texture2D gridLine;
         Texture2D windowSpaceLine;
         protected Button buttonNext;
         protected Button buttonPrevious;
         protected Button buttonPlay;
+        protected Button buttonReset;
 
-        protected int animationCounter = 0;
-        protected int animationCounterLimit = 0;
+        protected int animationCounter;
+        protected int animationCounterLimit;
 
         bool animating = false;
 
@@ -39,8 +40,26 @@ namespace HumanGraphicsPipelineXna
 
         protected State state = State.PickPoint1;
 
+        protected abstract void DerivedInit();
+
         public Scene()
         {
+            Init();
+            DerivedInit();
+        }
+
+        public void Init()
+        {
+            state = State.PickPoint1;
+            animationCounter = -1;
+            animationCounterLimit = 0;
+
+            trianglePoints = new Vector2[3];
+            normalisedTrianglePoints = new Vector2[3];
+            triangleSquares = new Square[3];
+            triangleLines = new Line[3]; //AB, BC, CA
+
+
             gridLine = new Texture2D(Globals.graphicsDevice, 1, 1, false, SurfaceFormat.Color);
             Color[] pixels = new Color[1];
             for (int i = 0; i < 1; i++)
@@ -52,16 +71,25 @@ namespace HumanGraphicsPipelineXna
             pixels[0] = new Color(0, 0, 0, 255);
             windowSpaceLine.SetData<Color>(pixels);
 
-            buttonNext = new Button(">", Fonts.font14, new Vector2(30, 30), new Vector2(Globals.viewport.X - 40, Globals.viewport.Y - 40), Color.DarkOliveGreen);
-            buttonPrevious = new Button("<", Fonts.font14, new Vector2(30, 30), new Vector2(Globals.viewport.X - 100, Globals.viewport.Y - 40), Color.DarkOliveGreen);
-            buttonPlay = new Button("||", Fonts.font14, new Vector2(30, 30), new Vector2(Globals.viewport.X - 70, Globals.viewport.Y - 40), Color.DarkOliveGreen);
+            buttonNext = new Button(">", Fonts.font14, new Vector2(30, 30), new Vector2(Globals.viewport.X - 40, Globals.viewport.Y - 80), Color.DarkOliveGreen);
+            buttonPrevious = new Button("<", Fonts.font14, new Vector2(30, 30), new Vector2(Globals.viewport.X - 100, Globals.viewport.Y - 80), Color.DarkOliveGreen);
+            buttonPlay = new Button("||", Fonts.font14, new Vector2(30, 30), new Vector2(Globals.viewport.X - 70, Globals.viewport.Y - 80), Color.DarkOliveGreen);
+            buttonReset = new Button("Reset", Fonts.font14, new Vector2(90, 30), new Vector2(Globals.viewport.X - 100, Globals.viewport.Y - 40), Color.DarkGreen);
 
-            buttonPlay.OnClick += (b) => animating = !animating;
-            buttonNext.OnClick += (b) => {if (!animating && animationCounter < animationCounterLimit) animationCounter++;};
+            buttonPlay.OnClick += (b) =>
+            {
+                animating = !animating;
+                if (!animating)
+                    buttonPlay.SetColour(Color.DarkOliveGreen);
+                else
+                    buttonPlay.SetColour(Color.DarkGreen);
+
+            };
+            buttonNext.OnClick += (b) => { if (!animating && animationCounter < animationCounterLimit) animationCounter++; };
             buttonNext.OnPress += (b) => { if (!animating && animationCounter < animationCounterLimit) animationCounter++; };
-            buttonPrevious.OnClick += (b) => { if (!animating && animationCounter > 0) animationCounter--; };
-            buttonPrevious.OnPress += (b) => { if (!animating && animationCounter > 0) animationCounter--; };
-            
+            buttonPrevious.OnClick += (b) => { if (!animating && animationCounter >= 0) animationCounter--; };
+            buttonPrevious.OnPress += (b) => { if (!animating && animationCounter >= 0) animationCounter--; };
+            buttonReset.OnClick += (b) => { Init(); DerivedInit(); };
         }
 
         public virtual void Update(GameTime gameTime)
@@ -71,11 +99,12 @@ namespace HumanGraphicsPipelineXna
             buttonPlay.Update(gameTime);
             buttonNext.Update(gameTime);
             buttonPrevious.Update(gameTime);
+            buttonReset.Update(gameTime);
 
             if (animating && animationCounter < animationCounterLimit)
                 animationCounter++;
-            else if (animationCounter >= animationCounterLimit)
-                animating = false;
+            else if (animating && animationCounter >= animationCounterLimit)
+                buttonPlay.EmulateClick();
             /*
             if (buttonPlay.IsClicked())
                 animating = !animating;
@@ -171,7 +200,7 @@ namespace HumanGraphicsPipelineXna
                 buttonPrevious.Draw(spriteBatch);
                 buttonPlay.Draw(spriteBatch);
                 buttonNext.Draw(spriteBatch);
-
+                buttonReset.Draw(spriteBatch);
             }
 
             DrawText(spriteBatch);
