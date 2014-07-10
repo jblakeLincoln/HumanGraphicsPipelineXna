@@ -89,6 +89,7 @@
     <Compile Include="Game1.cs" />
     <Compile Include="Scene.cs" />
     <Compile Include="Square.cs" />
+    <Compile Include="TriangleScene.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Game.ico" />

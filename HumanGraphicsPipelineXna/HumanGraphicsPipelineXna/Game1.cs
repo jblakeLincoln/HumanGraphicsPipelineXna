@@ -32,7 +32,7 @@ namespace HumanGraphicsPipelineXna
             None,
         }
 
-        MenuState menuState = MenuState.Main;
+        MenuState menuState = MenuState.TriangleFilling;
 
         public Game1()
         {
@@ -52,7 +52,7 @@ namespace HumanGraphicsPipelineXna
         {
             // TODO: Add your initialization logic here
             IsMouseVisible = true;
-
+            
            // Inputs.MouseState = Mouse.GetState();
             base.Initialize();
         }
@@ -76,12 +76,12 @@ namespace HumanGraphicsPipelineXna
         public void SetButtons()
         {
             buttonTriangleFilling = new Button("Triangle filling", Fonts.font14, new Vector2(150, 50), new Vector2(10, 10), Color.Red);
-            buttonHalfSpace = new Button("Half-space", Fonts.font14, new Vector2(150, 50), new Vector2(180, 10), Color.Red);
-            buttonBarycentric = new Button("Barycentric", Fonts.font14, new Vector2(150, 50), new Vector2(340, 10), Color.Red);
+            buttonHalfSpace = new Button("Half-space", Fonts.font14, new Vector2(150, 50), new Vector2(Globals.viewportWidth/2-200, Globals.viewportHeight/2-25), Color.Red);
+            buttonBarycentric = new Button("Barycentric", Fonts.font14, new Vector2(150, 50), new Vector2(Globals.viewportWidth/2+50, Globals.viewportHeight/2-25), Color.Red);
 
             buttonTriangleFilling.OnClick += (b) => menuState = MenuState.TriangleFilling;
-            buttonHalfSpace.OnClick += (b) => { menuState = MenuState.None; scene = new HalfSpace(); };
-            buttonBarycentric.OnClick += (b) => { menuState = MenuState.None; scene = new Barycentric(); };
+            buttonHalfSpace.OnClick += (b) => { menuState = MenuState.None; scene = new HalfSpace(); scene.BackToMenu += BackToTriangleMenu; };
+            buttonBarycentric.OnClick += (b) => { menuState = MenuState.None; scene = new Barycentric(); scene.BackToMenu += BackToTriangleMenu; };
         }
 
         /// <summary>
@@ -156,6 +156,12 @@ namespace HumanGraphicsPipelineXna
         {
             buttonHalfSpace.Draw(spriteBatch);
             buttonBarycentric.Draw(spriteBatch);
+        }
+
+        private void BackToTriangleMenu()
+        {
+            scene = null;
+            menuState = MenuState.TriangleFilling;
         }
         #endregion
     }

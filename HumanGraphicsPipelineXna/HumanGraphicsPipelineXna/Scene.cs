@@ -24,11 +24,15 @@ namespace HumanGraphicsPipelineXna
         protected Button buttonPrevious;
         protected Button buttonPlay;
         protected Button buttonReset;
+        protected Button buttonBack;
 
         protected int animationCounter;
         protected int animationCounterLimit;
 
         bool animating = false;
+
+        public delegate void ThisBackToMenu();
+        public event ThisBackToMenu BackToMenu;
 
         protected enum State
         {
@@ -71,54 +75,48 @@ namespace HumanGraphicsPipelineXna
             pixels[0] = new Color(0, 0, 0, 255);
             windowSpaceLine.SetData<Color>(pixels);
 
-            buttonNext = new Button(">", Fonts.font14, new Vector2(30, 30), new Vector2(Globals.viewport.X - 40, Globals.viewport.Y - 80), Color.DarkOliveGreen);
-            buttonPrevious = new Button("<", Fonts.font14, new Vector2(30, 30), new Vector2(Globals.viewport.X - 100, Globals.viewport.Y - 80), Color.DarkOliveGreen);
-            buttonPlay = new Button("||", Fonts.font14, new Vector2(30, 30), new Vector2(Globals.viewport.X - 70, Globals.viewport.Y - 80), Color.DarkOliveGreen);
+            buttonNext = new Button(">", Fonts.font14, new Vector2(30, 30), new Vector2(Globals.viewport.X - 40, Globals.viewport.Y - 70), Color.DarkOliveGreen);
+            buttonPrevious = new Button("<", Fonts.font14, new Vector2(30, 30), new Vector2(Globals.viewport.X - 100, Globals.viewport.Y - 70), Color.DarkOliveGreen);
+            buttonPlay = new Button("||", Fonts.font14, new Vector2(30, 30), new Vector2(Globals.viewport.X - 70, Globals.viewport.Y - 70), Color.DarkSlateBlue);
             buttonReset = new Button("Reset", Fonts.font14, new Vector2(90, 30), new Vector2(Globals.viewport.X - 100, Globals.viewport.Y - 40), Color.DarkGreen);
+            buttonBack = new Button("Back", Fonts.font14, new Vector2(90, 30), new Vector2(Globals.viewportWidth-100, Globals.viewportHeight-100), Color.DarkRed);
 
             buttonPlay.OnClick += (b) =>
             {
                 animating = !animating;
                 if (!animating)
-                    buttonPlay.SetColour(Color.DarkOliveGreen);
+                    buttonPlay.SetColour(Color.DarkSlateBlue);
                 else
-                    buttonPlay.SetColour(Color.DarkGreen);
+                    buttonPlay.SetColour(Color.DarkSlateGray);
 
             };
+
             buttonNext.OnClick += (b) => { if (!animating && animationCounter < animationCounterLimit) animationCounter++; };
             buttonNext.OnPress += (b) => { if (!animating && animationCounter < animationCounterLimit) animationCounter++; };
             buttonPrevious.OnClick += (b) => { if (!animating && animationCounter >= 0) animationCounter--; };
             buttonPrevious.OnPress += (b) => { if (!animating && animationCounter >= 0) animationCounter--; };
             buttonReset.OnClick += (b) => { Init(); DerivedInit(); };
+            buttonBack.OnClick += (b) => { BackToMenu(); };
         }
 
         public virtual void Update(GameTime gameTime)
         {
             
             StateChanges(gameTime);
-            buttonPlay.Update(gameTime);
-            buttonNext.Update(gameTime);
-            buttonPrevious.Update(gameTime);
-            buttonReset.Update(gameTime);
+
+            if (state == State.Animate)
+            {
+                buttonPlay.Update(gameTime);
+                buttonNext.Update(gameTime);
+                buttonPrevious.Update(gameTime);
+                buttonReset.Update(gameTime);
+                buttonBack.Update(gameTime);
+            }
 
             if (animating && animationCounter < animationCounterLimit)
                 animationCounter++;
             else if (animating && animationCounter >= animationCounterLimit)
                 buttonPlay.EmulateClick();
-            /*
-            if (buttonPlay.IsClicked())
-                animating = !animating;
-
-            
-
-            if (!animating)
-            {
-                if (buttonNext.IsClicked() && animationCounter < animationCounterLimit)
-                    animationCounter++;
-                if (buttonPrevious.IsPressed())
-                    animationCounter--;
-            }
-             * */
         }
 
         protected abstract void LastTrianglePointPlaced(GameTime gameTime);
@@ -156,7 +154,14 @@ namespace HumanGraphicsPipelineXna
             spriteBatch.Draw(windowSpaceLine, new Rectangle(0, Globals.viewportHeight / 2 - 2, (Globals.viewportWidth), 4), Color.White);
         }
 
-        
+
+        public Vector2 NormalisePoints(Vector2 vIn)
+        {
+            float normalisedX = (vIn.X - 0) / ((Globals.viewportWidth / 2) - 0) - 0.5f * 2;
+            float normalisedY = -((vIn.Y - 0) / ((Globals.viewportHeight / 2) - 0) - 0.5f * 2);
+
+            return new Vector2(normalisedX, normalisedY);
+        }
 
         public virtual void Draw(SpriteBatch spriteBatch) 
         {
@@ -168,11 +173,9 @@ namespace HumanGraphicsPipelineXna
                 {
                     triangleSquares[i].Draw(spriteBatch);
 
-                    float normalisedX = (trianglePoints[i].X - 0) / ((Globals.viewportWidth / 2) - 0) - 0.5f * 2;
-                    float normalisedY = (trianglePoints[i].Y - 0) / ((Globals.viewportHeight / 2) - 0) - 0.5f * 2;
+                    normalisedTrianglePoints[i] = NormalisePoints(trianglePoints[i]);
 
-                    normalisedTrianglePoints[i] = new Vector2(normalisedX, normalisedY);
-                    spriteBatch.DrawString(Fonts.smallFont, normalisedTrianglePoints[i].X.ToString() + ", " + normalisedTrianglePoints[i].Y.ToString(), new Vector2(trianglePoints[i].X - 10, trianglePoints[i].Y - 15), Color.White);
+                    spriteBatch.DrawString(Fonts.arial14, Convert.ToChar(65+i).ToString(), new Vector2(trianglePoints[i].X - 20, trianglePoints[i].Y - 20), Color.White);
                 }
             }
 
@@ -183,20 +186,17 @@ namespace HumanGraphicsPipelineXna
                 ActionOnTriangleDraw(spriteBatch);
             }
 
-
-            if (state == State.Animate)
-            {
-                buttonPrevious.Draw(spriteBatch);
-                buttonPlay.Draw(spriteBatch);
-                buttonNext.Draw(spriteBatch);
-                buttonReset.Draw(spriteBatch);
-            }
+            buttonPrevious.Draw(spriteBatch);
+            buttonPlay.Draw(spriteBatch);
+            buttonNext.Draw(spriteBatch);
+            buttonReset.Draw(spriteBatch);
+            buttonBack.Draw(spriteBatch);
 
             DrawText(spriteBatch);
         }
 
         protected abstract void ActionOnTriangleDraw(SpriteBatch spriteBatch);
 
-        protected virtual void DrawText(SpriteBatch spriteBatch) {}
+        protected virtual void DrawText(SpriteBatch spriteBatch) { }
     }
 }
