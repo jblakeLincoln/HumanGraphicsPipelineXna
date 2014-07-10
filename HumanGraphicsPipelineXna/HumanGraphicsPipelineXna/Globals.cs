@@ -15,7 +15,7 @@ namespace HumanGraphicsPipelineXna
     {
         public static void Init()
         {
-            pixelSize = 1;
+            pixelSize = 20;
             
 
         }

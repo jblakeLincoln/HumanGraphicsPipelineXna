@@ -12,7 +12,7 @@ using Drawing = System.Drawing;
 
 namespace HumanGraphicsPipelineXna
 {
-    class Button
+    public class Button
     {
         Texture2D tex;
         Vector2 position;
@@ -22,6 +22,17 @@ namespace HumanGraphicsPipelineXna
 
         Vector2 textSize;
         Vector2 textCentre;
+
+        public delegate void ThisOnClick(Button b);
+        public event ThisOnClick OnClick;
+
+        public delegate void ThisOnPress(Button b);
+        public event ThisOnPress OnPress;
+
+        float thresh = 500;
+
+        TimeSpan pressTimer = TimeSpan.Zero;
+
         public Button(string s, SpriteFont f, Vector2 dim, Vector2 pos, Color col)
         {
             text = s;
@@ -49,13 +60,19 @@ namespace HumanGraphicsPipelineXna
         /// <summary>
         /// Detects mouse click on release
         /// </summary>
-        public bool IsClicked()
+        public bool IsClicked(GameTime gameTime)
         {
             if (new Rectangle((int)position.X, (int)position.Y, (int)dimensions.X, (int)dimensions.Y).Contains(Inputs.MouseState.X, Inputs.MouseState.Y) &&
-                Inputs.MouseState.LeftButton == ButtonState.Released && Inputs.MouseStatePrevious.LeftButton == ButtonState.Pressed)
+                Inputs.MouseState.LeftButton == ButtonState.Pressed)
             {
-                return true;
+
+                pressTimer += gameTime.ElapsedGameTime;
+                Console.WriteLine(gameTime.ElapsedGameTime.TotalMilliseconds);
+                if (pressTimer.TotalMilliseconds <= gameTime.ElapsedGameTime.TotalMilliseconds)
+                    return true;
             }
+            else if (pressTimer.TotalMilliseconds > 0 && Inputs.MouseState.LeftButton == ButtonState.Released)
+                pressTimer = TimeSpan.Zero;
 
             return false;
         }
@@ -63,20 +80,16 @@ namespace HumanGraphicsPipelineXna
         /// <summary>
         /// Detects continued mouse click (held click)
         /// </summary>
-        public bool IsPressed()
-        {
-            if (new Rectangle((int)position.X, (int)position.Y, (int)dimensions.X, (int)dimensions.Y).Contains(Inputs.MouseState.X, Inputs.MouseState.Y) &&
-                Inputs.MouseState.LeftButton == ButtonState.Pressed)
-            {
-                return true;
-            }
-
-            return false;
-        }
-
         public virtual void Update(GameTime gameTime)
         {
-            
+            if (OnClick != null && IsClicked(gameTime))
+            {
+                OnClick(this);
+            }
+            else if (OnPress != null && pressTimer.TotalMilliseconds > thresh)
+            {
+                OnPress(this);
+            }
         }
 
         public virtual void Draw(SpriteBatch spriteBatch)

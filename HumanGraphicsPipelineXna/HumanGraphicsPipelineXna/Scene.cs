@@ -55,20 +55,32 @@ namespace HumanGraphicsPipelineXna
             buttonNext = new Button(">", Fonts.font14, new Vector2(30, 30), new Vector2(Globals.viewport.X - 40, Globals.viewport.Y - 40), Color.DarkOliveGreen);
             buttonPrevious = new Button("<", Fonts.font14, new Vector2(30, 30), new Vector2(Globals.viewport.X - 100, Globals.viewport.Y - 40), Color.DarkOliveGreen);
             buttonPlay = new Button("||", Fonts.font14, new Vector2(30, 30), new Vector2(Globals.viewport.X - 70, Globals.viewport.Y - 40), Color.DarkOliveGreen);
+
+            buttonPlay.OnClick += (b) => animating = !animating;
+            buttonNext.OnClick += (b) => {if (!animating && animationCounter < animationCounterLimit) animationCounter++;};
+            buttonNext.OnPress += (b) => { if (!animating && animationCounter < animationCounterLimit) animationCounter++; };
+            buttonPrevious.OnClick += (b) => { if (!animating && animationCounter > 0) animationCounter--; };
+            buttonPrevious.OnPress += (b) => { if (!animating && animationCounter > 0) animationCounter--; };
             
         }
 
         public virtual void Update(GameTime gameTime)
         {
+            
             StateChanges(gameTime);
-
-            if (buttonPlay.IsClicked())
-                animating = !animating;
+            buttonPlay.Update(gameTime);
+            buttonNext.Update(gameTime);
+            buttonPrevious.Update(gameTime);
 
             if (animating && animationCounter < animationCounterLimit)
                 animationCounter++;
             else if (animationCounter >= animationCounterLimit)
                 animating = false;
+            /*
+            if (buttonPlay.IsClicked())
+                animating = !animating;
+
+            
 
             if (!animating)
             {
@@ -77,6 +89,7 @@ namespace HumanGraphicsPipelineXna
                 if (buttonPrevious.IsPressed())
                     animationCounter--;
             }
+             * */
         }
 
         protected abstract void LastTrianglePointPlaced(GameTime gameTime);

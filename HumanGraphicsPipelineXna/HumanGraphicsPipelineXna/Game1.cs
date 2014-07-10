@@ -8,6 +8,7 @@ using Microsoft.Xna.Framework.GamerServices;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Media;
+using System.Windows.Forms;
 
 namespace HumanGraphicsPipelineXna
 {
@@ -20,7 +21,7 @@ namespace HumanGraphicsPipelineXna
 
         Button buttonHalfSpace;
         Button buttonBarycentric;
-        Button buttonTriangleFilling;
+        private Button buttonTriangleFilling;
 
         Scene scene;
 
@@ -67,12 +68,20 @@ namespace HumanGraphicsPipelineXna
             Fonts.font14 = Content.Load<SpriteFont>("Font14");
             Fonts.smallFont = Content.Load<SpriteFont>("SmallFont");
             Fonts.arial14 = Content.Load<SpriteFont>("Arial14");
+
+            SetButtons();
             
+        }
+
+        public void SetButtons()
+        {
             buttonTriangleFilling = new Button("Triangle filling", Fonts.font14, new Vector2(150, 50), new Vector2(10, 10), Color.Red);
             buttonHalfSpace = new Button("Half-space", Fonts.font14, new Vector2(150, 50), new Vector2(180, 10), Color.Red);
             buttonBarycentric = new Button("Barycentric", Fonts.font14, new Vector2(150, 50), new Vector2(340, 10), Color.Red);
 
-            // TODO: use this.Content to load your game content here
+            buttonTriangleFilling.OnClick += (b) => menuState = MenuState.TriangleFilling;
+            buttonHalfSpace.OnClick += (b) => { menuState = MenuState.None; scene = new HalfSpace(); };
+            buttonBarycentric.OnClick += (b) => menuState = MenuState.None;
         }
 
         /// <summary>
@@ -95,27 +104,12 @@ namespace HumanGraphicsPipelineXna
 
             if (scene != null)
                 scene.Update(gameTime);
-            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed)
-                this.Exit();
 
-            if (menuState == MenuState.Main)
-            {
-                if (buttonTriangleFilling.IsClicked())
-                    menuState = MenuState.TriangleFilling;
-            }
-            else if (menuState == MenuState.TriangleFilling)
-            {
-                if (buttonHalfSpace.IsClicked())
-                {
-                    scene = new HalfSpace();
-                    menuState = MenuState.None;
-                }
-                else if (buttonBarycentric.IsClicked())
-                {
-                    menuState = MenuState.None;
-                }
- 
-            }
+            buttonTriangleFilling.Update(gameTime);
+            buttonHalfSpace.Update(gameTime);
+            buttonBarycentric.Update(gameTime);
+            //if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed)
+                //this.Exit();
 
             base.Update(gameTime);
         }
