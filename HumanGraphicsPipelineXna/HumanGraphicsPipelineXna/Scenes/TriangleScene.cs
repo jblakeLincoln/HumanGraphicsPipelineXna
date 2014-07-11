@@ -85,6 +85,49 @@ namespace HumanGraphicsPipelineXna
             }
         }
 
+        private void PerformAllActionsThread()
+        {
+            int count = 0;
+            int x = 0;
+            int y = 0;
+            for (int i = 0; i < (maximum.X - minimum.X) / Globals.pixelSize; i++)
+            {
+                listPixelCheck.Add(new List<bool>());
+                listSquares.Add(new List<Square>());
+                for (int j = 0; j < (maximum.Y - minimum.Y) / Globals.pixelSize; j++)
+                {
+                    listPixelCheck[i].Add(false);
+                    check = (new Vector2(minimum.X + (i * Globals.pixelSize) + (Globals.pixelSize / 2), minimum.Y + (j * Globals.pixelSize) + (Globals.pixelSize / 2)));
+                    Color col;
+
+                    if (PerformFillingFunction(NormalisePoints(check), i, j))
+                    {
+                        listPixelCheck[i][j] = true;
+                        col = new Color(0, 120, 120, 180);
+                    }
+                    else
+                    {
+                        listPixelCheck[i][j] = false;
+                        col = new Color(255, 0, 0, 100);
+                    }
+
+                    listSquares[i].Add(new Square(new Vector2(minimum.X + (i * Globals.pixelSize), minimum.Y + (j * Globals.pixelSize)), new Vector2(Globals.pixelSize, Globals.pixelSize), col));
+                    count++;
+                    animationCounterLimit++;
+                    x++;
+                }
+                count = 0;
+                y++;
+            }
+
+            if (x < 2 || y < 2)
+            {
+                Init();
+                DerivedInit();
+            }
+            //animationCounterLimit = (listPixelCheck.Count * listPixelCheck[0].Count - 2);
+        }
+
         protected override void ActionOnTriangleDraw(Microsoft.Xna.Framework.Graphics.SpriteBatch spriteBatch)
         {
             boundingBox.Draw(spriteBatch);
@@ -92,34 +135,8 @@ namespace HumanGraphicsPipelineXna
             // Once all points are placed, check if they are within triangle.
             if (listPixelCheck.Count == 0)
             {
-                int count = 0;
-                for (int i = 0; i < (maximum.X - minimum.X) / Globals.pixelSize; i++)
-                {
-                    listPixelCheck.Add(new List<bool>());
-                    listSquares.Add(new List<Square>());
-                    for (int j = 0; j < (maximum.Y - minimum.Y) / Globals.pixelSize; j++)
-                    {
-                        listPixelCheck[i].Add(false);
-                        check = (new Vector2(minimum.X + (i * Globals.pixelSize) + (Globals.pixelSize / 2), minimum.Y + (j * Globals.pixelSize) + (Globals.pixelSize / 2)));
-                        Color col;
-
-                        if (PerformFillingFunction(NormalisePoints(check), i, j))
-                        {
-                            listPixelCheck[i][j] = true;
-                            col = new Color(0, 120, 120, 180);
-                        }
-                        else
-                        {
-                            listPixelCheck[i][j] = false;
-                            col = new Color(255, 0, 0, 100);
-                        }
-
-                        listSquares[i].Add(new Square(new Vector2(minimum.X + (i * Globals.pixelSize), minimum.Y + (j * Globals.pixelSize)), new Vector2(Globals.pixelSize, Globals.pixelSize), col));
-                        count++;
-                    }
-                    count = 0;
-                }
-                animationCounterLimit = (listPixelCheck.Count * listPixelCheck[0].Count-2);
+                System.Threading.Thread t = new System.Threading.Thread(PerformAllActionsThread);
+                t.Start();
             }
         }
 
@@ -150,19 +167,63 @@ namespace HumanGraphicsPipelineXna
             {
                 bool breakNow = false;
                 int count = 0;
+
+                int limit = 0;
+
+                int sleepCount = 0;
+                while (listSquares.Count < 2)
+                {
+                    System.Threading.Thread.Sleep(1);
+                    sleepCount++;
+
+                    if (sleepCount > 100)
+                    {
+                        return;
+                    }
+                }
+
+                while (listSquares[0].Count < 2)
+                    System.Threading.Thread.Sleep(1);
+
+                Console.WriteLine(listSquares.Count);
+                Console.WriteLine(listSquares[0].Count);
+                if (listPixelCheck[0].Count * listPixelCheck.Count < animationCounter)
+                    limit = listPixelCheck[0].Count * listPixelCheck.Count;
+                else
+                    limit = animationCounterLimit;
+
+
+                bool tryDraw = false;
                 for (int j = 0; j < listPixelCheck[0].Count; j++)
                 {
                     for (int i = 0; i < listPixelCheck.Count; i++)
                     {
+                        if (listSquares[0].Count * listSquares.Count < animationCounterLimit)
+                        {
+                            breakNow = true;
+                            break;
+                        }
 
-                        listSquares[i][j].Draw(spriteBatch);
+                        if (i == 0 && j == 0)
+                            tryDraw = true;
+
+                        if (tryDraw)
+                        {
+                            try
+                            {
+                                listSquares[i][j].Draw(spriteBatch);
+                            }
+                            catch { breakNow = true; break; }
+                        }
+                        else
+                            listSquares[i][j].Draw(spriteBatch);
 
                         if (count > animationCounter)
                         {
                             if (new Vector2(i, j) != pixelInBox)
                                 previousPixelInBox = new Vector2(pixelInBox.X, pixelInBox.Y);
 
-                            Square sq = new Square(new Vector2(minimum.X + (pixelInBox.X * Globals.pixelSize) + (Globals.pixelSize / 2)-2, minimum.Y + (Globals.pixelSize * pixelInBox.Y) + (Globals.pixelSize / 2)-2), new Vector2(4, 4), Color.Green);
+                            Square sq = new Square(new Vector2(minimum.X + (pixelInBox.X * Globals.pixelSize) + (Globals.pixelSize / 2) - 2, minimum.Y + (Globals.pixelSize * pixelInBox.Y) + (Globals.pixelSize / 2) - 2), new Vector2(4, 4), Color.Green);
                             sq.Draw(spriteBatch);
                             breakNow = true;
                             check = new Vector2(minimum.X + (i * Globals.pixelSize) + (Globals.pixelSize / 2), minimum.Y + (j * Globals.pixelSize) + (Globals.pixelSize / 2));
