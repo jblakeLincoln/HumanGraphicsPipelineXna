@@ -13,10 +13,7 @@ namespace HumanGraphicsPipelineXna
 {
     class Fonts
     {
-        public void Init()
-        { 
-        
-        }
+        public void Init(){ }
         
         public static SpriteFont smallFont { get; set; }
         public static SpriteFont font14 { get; set; }

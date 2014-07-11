@@ -12,65 +12,45 @@ using System.Windows.Forms;
 
 namespace HumanGraphicsPipelineXna
 {
-    /// <summary>
-    /// This is the main type for your game
-    /// </summary>
     public class Game1 : Microsoft.Xna.Framework.Game
     {
         SpriteBatch spriteBatch;       
 
         Button buttonHalfSpace;
         Button buttonBarycentric;
-        private Button buttonTriangleFilling;
+        Button buttonTriangleFilling;
 
         Scene scene;
-
         enum MenuState
         { 
             Main,
             TriangleFilling,
             None,
         }
-
         MenuState menuState = MenuState.TriangleFilling;
 
         public Game1()
         {
             Globals.graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
-            IsFixedTimeStep = false;
+            IsFixedTimeStep = true;
             Globals.Init();
         }
 
-        /// <summary>
-        /// Allows the game to perform any initialization it needs to before starting to run.
-        /// This is where it can query for any required services and load any non-graphic
-        /// related content.  Calling base.Initialize will enumerate through any components
-        /// and initialize them as well.
-        /// </summary>
         protected override void Initialize()
         {
-            // TODO: Add your initialization logic here
             IsMouseVisible = true;
-            
-           // Inputs.MouseState = Mouse.GetState();
             base.Initialize();
         }
 
-        /// <summary>
-        /// LoadContent will be called once per game and is the place to load
-        /// all of your content.
-        /// </summary>
         protected override void LoadContent()
         {
-            // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
             Fonts.font14 = Content.Load<SpriteFont>("Font14");
             Fonts.smallFont = Content.Load<SpriteFont>("SmallFont");
             Fonts.arial14 = Content.Load<SpriteFont>("Arial14");
 
             SetButtons();
-            
         }
 
         public void SetButtons()
@@ -84,20 +64,10 @@ namespace HumanGraphicsPipelineXna
             buttonBarycentric.OnClick += (b) => { menuState = MenuState.None; scene = new Barycentric(); scene.BackToMenu += BackToTriangleMenu; };
         }
 
-        /// <summary>
-        /// UnloadContent will be called once per game and is the place to unload
-        /// all content.
-        /// </summary>
         protected override void UnloadContent()
         {
-            // TODO: Unload any non ContentManager content here
         }
 
-        /// <summary>
-        /// Allows the game to run logic such as updating the world,
-        /// checking for collisions, gathering input, and playing audio.
-        /// </summary>
-        /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Update(GameTime gameTime)
         {
             Inputs.Update(gameTime);
@@ -119,29 +89,23 @@ namespace HumanGraphicsPipelineXna
             base.Update(gameTime);
         }
 
-        /// <summary>
-        /// This is called when the game should draw itself.
-        /// </summary>
-        /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Draw(GameTime gameTime)
         {
             GraphicsDevice.Clear(Color.SlateGray);
 
             spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.LinearClamp, DepthStencilState.None, RasterizerState.CullNone);
+                switch(menuState)
+                {
+                    case MenuState.Main:
+                        DrawMainMenu(spriteBatch);
+                        break;
+                    case MenuState.TriangleFilling:
+                        DrawTriangleFillingMenu(spriteBatch);
+                        break;
+                }
 
-            switch(menuState)
-            {
-                case MenuState.Main:
-                    DrawMainMenu(spriteBatch);
-                    break;
-                case MenuState.TriangleFilling:
-                    DrawTriangleFillingMenu(spriteBatch);
-                    break;
-            }
-
-            if (scene != null)
-                scene.Draw(spriteBatch);
-
+                if (scene != null)
+                    scene.Draw(spriteBatch);
             spriteBatch.End();
             base.Draw(gameTime);
         }
@@ -158,6 +122,7 @@ namespace HumanGraphicsPipelineXna
             buttonBarycentric.Draw(spriteBatch);
         }
 
+        // Added to scene object when TriangleScene is created.
         private void BackToTriangleMenu()
         {
             scene = null;

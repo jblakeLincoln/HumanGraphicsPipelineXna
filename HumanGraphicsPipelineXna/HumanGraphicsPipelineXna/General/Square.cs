@@ -13,19 +13,17 @@ namespace HumanGraphicsPipelineXna
 {
     class Square
     {
-        Texture2D tex;
-        Color[] pixels = {Color.Black};
+        public Vector2 position { get; private set; }
+        private Texture2D tex;
+        private Color[] pixels = {Color.Black};
+        private Vector2 size;
 
-        public Vector2 position { get;private set;}
-        Vector2 size;
         public Square(Vector2 pos, Vector2 sizeIn, Color col)
         {
-
             pixels[0] = col;
-
             position = pos;
             size = sizeIn;
-            tex = new Texture2D(Globals.graphicsDevice, 1, 1, false, SurfaceFormat.Color);
+            tex = new Texture2D(Globals.graphicsDevice, 1, 1, true, SurfaceFormat.Color);
             tex.SetData<Color>(pixels);
         }
 

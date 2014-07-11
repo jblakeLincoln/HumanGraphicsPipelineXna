@@ -16,10 +16,7 @@ namespace HumanGraphicsPipelineXna
         static public MouseState MouseState { get; private set; }
         static public MouseState MouseStatePrevious { get; private set; }
 
-        public void Init()
-        { 
-            
-        }
+        public void Init() { }
 
         static public void Update(GameTime gameTime)
         {

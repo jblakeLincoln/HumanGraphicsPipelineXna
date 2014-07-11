@@ -13,13 +13,14 @@ namespace HumanGraphicsPipelineXna
 {
     class Line
     {
-        Texture2D pixel;
-        Vector2 p1;
-        Vector2 p2;
-        float length;
-        float angle;
-        Color color;
-        float thickness;
+        private Texture2D pixel;
+        private Vector2 p1;
+        private Vector2 p2;
+        private float length;
+        private float angle;
+        private Color color;
+        private float thickness;
+
         public Line(Vector2 point1, Vector2 point2, Color col, float thicknessIn)
         {
             p1 = point1;
@@ -27,13 +28,12 @@ namespace HumanGraphicsPipelineXna
             color = col;
             thickness = thicknessIn;
 
-            pixel = new Texture2D(Globals.graphicsDevice, 1, 1);
+            pixel = new Texture2D(Globals.graphicsDevice, 1, 1, true, SurfaceFormat.Color);
             pixel.SetData(new Color[] { color });
 
             Vector2 direction = p2 - p1;
             length = direction.Length();
             angle = (float)Math.Atan2(direction.Y, direction.X);
-            
         }
 
         public virtual void Draw(SpriteBatch spriteBatch)

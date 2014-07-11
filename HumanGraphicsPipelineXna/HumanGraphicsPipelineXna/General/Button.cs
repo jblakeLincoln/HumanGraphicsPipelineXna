@@ -14,38 +14,31 @@ namespace HumanGraphicsPipelineXna
 {
     public class Button
     {
-        Texture2D tex;
-        Vector2 position;
-        Vector2 dimensions;
-        string text;
-        SpriteFont font;
 
-        Vector2 textSize;
-        Vector2 textCentre;
+        private float thresh = 500;
+        private string text;
+
+        private Vector2 position;
+        private Vector2 dimensions;
+        private Vector2 textSize;
+        private Vector2 textCentre;
+        private SpriteFont font;
+        private Texture2D tex;
+        private TimeSpan pressTimer = TimeSpan.Zero;
 
         public delegate void ThisOnClick(Button b);
         public event ThisOnClick OnClick;
-
-        public delegate void ThisOnPress(Button b);
-        public event ThisOnPress OnPress;
-
-        float thresh = 500;
-
-        TimeSpan pressTimer = TimeSpan.Zero;
-
+        public delegate void ThisOnHold(Button b);
+        public event ThisOnHold OnHold;
 
         public Button(string s, SpriteFont f, Vector2 dim, Vector2 pos, Color col)
         {
             text = s;
             dimensions = new Vector2(dim.X, dim.Y);
-            
             position = pos;
-
             SetColour(col);
-
             textSize = f.MeasureString(s);
             textCentre = new Vector2(Globals.graphics.GraphicsDevice.Viewport.Width / 2, dim.Y);
-
             font = f;
         }
 
@@ -57,12 +50,9 @@ namespace HumanGraphicsPipelineXna
 
         public void SetColour(Color col)
         {
-        Color[] pixels = new Color[1];
-
-                    pixels[0] = new Color(col.R, col.G, col.B, col.A);
-
+            Color[] pixels = new Color[1];
+            pixels[0] = new Color(col.R, col.G, col.B, col.A);
             tex = new Texture2D(Globals.graphics.GraphicsDevice, 1, 1);
-
             tex.SetData<Color>(pixels);
         }
 
@@ -92,13 +82,9 @@ namespace HumanGraphicsPipelineXna
         public virtual void Update(GameTime gameTime)
         {
             if (OnClick != null && IsClicked(gameTime))
-            {
                 OnClick(this);
-            }
-            else if (OnPress != null && pressTimer.TotalMilliseconds > thresh)
-            {
-                OnPress(this);
-            }
+            else if (OnHold != null && pressTimer.TotalMilliseconds > thresh)
+                OnHold(this);
         }
 
         public virtual void Draw(SpriteBatch spriteBatch)
