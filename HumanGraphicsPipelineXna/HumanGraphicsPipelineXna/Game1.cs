@@ -8,7 +8,7 @@ using Microsoft.Xna.Framework.GamerServices;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Media;
-using System.Windows.Forms;
+using WF = System.Windows.Forms;
 
 namespace HumanGraphicsPipelineXna
 {
@@ -35,6 +35,8 @@ namespace HumanGraphicsPipelineXna
             Content.RootDirectory = "Content";
             IsFixedTimeStep = true;
             Globals.Init();
+
+            CreateForm();
         }
 
         protected override void Initialize()
@@ -129,5 +131,24 @@ namespace HumanGraphicsPipelineXna
             menuState = MenuState.TriangleFilling;
         }
         #endregion
+
+
+        readonly WF.Panel panel = new WF.Panel();
+
+        private void CreateForm()
+        {
+            var form = WF.Control.FromHandle(Window.Handle) as WF.Form;
+            panel.Dock = WF.DockStyle.Right;
+            panel.Width = 250;
+
+            WF.Button b = new WF.Button();
+            b.Text = "Halfspace";
+            b.Click += (sender, args) => { menuState = MenuState.None; scene = new HalfSpace(); scene.BackToMenu += BackToTriangleMenu; };
+            
+
+            if (form != null)
+                form.Controls.Add(panel);
+            panel.Controls.Add(b);
+        }
     }
 }

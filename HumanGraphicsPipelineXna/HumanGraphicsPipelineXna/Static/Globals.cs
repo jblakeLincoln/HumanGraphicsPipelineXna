@@ -15,7 +15,7 @@ namespace HumanGraphicsPipelineXna
     {
         public static void Init()
         {
-            pixelSize = 10;
+            pixelSize = 20;
         }
 
         public static GraphicsDeviceManager graphics { get; set; }

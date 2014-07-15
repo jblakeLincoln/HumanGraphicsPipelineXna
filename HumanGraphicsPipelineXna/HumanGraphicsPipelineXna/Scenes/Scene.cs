@@ -142,14 +142,24 @@ namespace HumanGraphicsPipelineXna
 
         protected void DrawGrid(SpriteBatch spriteBatch)
         {
+
+            //Pixel grid
             for (int i = 0; i <= (Globals.viewportHeight / Globals.pixelSize); i++)
                 spriteBatch.Draw(gridLine, new Rectangle(0, i * (Globals.viewportHeight / (Globals.viewportHeight / Globals.pixelSize)), Globals.viewportWidth, 1), Color.White);
 
             for (int i = 0; i <= (Globals.viewportWidth / Globals.pixelSize); i++)
                 spriteBatch.Draw(gridLine, new Rectangle(i * (Globals.viewportWidth / (Globals.viewportWidth / Globals.pixelSize)), 0, 1, Globals.viewportHeight), Color.White);
-
+            
             spriteBatch.Draw(windowSpaceLine, new Rectangle(Globals.viewportWidth / 2 - 2, 0, 4, Globals.viewportHeight), Color.White);
             spriteBatch.Draw(windowSpaceLine, new Rectangle(0, Globals.viewportHeight / 2 - 2, (Globals.viewportWidth), 4), Color.White);
+
+            /*//Screen space grid
+            for (int i = 0; i <= 20; i++)
+                spriteBatch.Draw(gridLine, new Rectangle(0, i * (Globals.viewportHeight/20), Globals.viewportWidth, 1), Color.White);
+
+            for (int i = 0; i <= 20; i++)
+                spriteBatch.Draw(gridLine, new Rectangle(i * (Globals.viewportWidth/20), 0, 1, Globals.viewportHeight), Color.White);
+            */
         }
     }
 }
