@@ -98,6 +98,8 @@ namespace HumanGraphicsPipelineXna
             if (listPixelCheck.Count == 0)
             {
                 Console.Clear();
+                Console.WriteLine("");
+                Console.WriteLine("New Triangle");
                 int count = 0;
                 for (int i = 0; i < (maximum.X - minimum.X) / Globals.pixelSize; i++)
                 {
