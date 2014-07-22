@@ -66,7 +66,6 @@ namespace HumanGraphicsPipelineXna
             {
 
                 pressTimer += gameTime.ElapsedGameTime;
-                Console.WriteLine(gameTime.ElapsedGameTime.TotalMilliseconds);
                 if (pressTimer.TotalMilliseconds <= gameTime.ElapsedGameTime.TotalMilliseconds)
                     return true;
             }

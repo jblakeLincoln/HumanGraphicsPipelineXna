@@ -93,10 +93,11 @@ namespace HumanGraphicsPipelineXna
         protected override void ActionOnTriangleDraw(Microsoft.Xna.Framework.Graphics.SpriteBatch spriteBatch)
         {
             boundingBox.Draw(spriteBatch);
-
+            
             // Once all points are placed, check if they are within triangle.
             if (listPixelCheck.Count == 0)
             {
+                Console.Clear();
                 int count = 0;
                 for (int i = 0; i < (maximum.X - minimum.X) / Globals.pixelSize; i++)
                 {
@@ -120,6 +121,13 @@ namespace HumanGraphicsPipelineXna
                         }
 
                         listSquares[i].Add(new Square(new Vector2(minimum.X + (i * Globals.pixelSize), minimum.Y + (j * Globals.pixelSize)), new Vector2(Globals.pixelSize, Globals.pixelSize), col));
+                        
+                        Vector2 pOut = NormalisePoints(listSquares[i][j].position);
+                        //Console.WriteLine("X: " + pOut.X + "\tY: " + pOut.Y + "\t" + listPixelCheck[i][j]);
+
+                        string xSpace = (pOut.X < 0) ? "" : " ";
+                        string ySpace = (pOut.Y < 0) ? "" : " ";
+                        Console.WriteLine("X:" + xSpace + "{0}\t\tY:" + ySpace + "{1}\t\t{2}", pOut.X.ToString("F"), pOut.Y.ToString("F"), listPixelCheck[i][j]);
                         count++;
                     }
                     count = 0;

@@ -36,7 +36,7 @@ namespace HumanGraphicsPipelineXna
             IsFixedTimeStep = true;
             Globals.Init();
 
-            CreateForm();
+            //CreateForm();
         }
 
         protected override void Initialize()
@@ -133,22 +133,21 @@ namespace HumanGraphicsPipelineXna
         #endregion
 
 
-        readonly WF.Panel panel = new WF.Panel();
+        
 
         private void CreateForm()
         {
-            var form = WF.Control.FromHandle(Window.Handle) as WF.Form;
-            panel.Dock = WF.DockStyle.Right;
-            panel.Width = 250;
+            WF.Control form = WF.Control.FromHandle(Window.Handle);
+            
 
             WF.Button b = new WF.Button();
             b.Text = "Halfspace";
+            b.FlatStyle = WF.FlatStyle.Standard;
             b.Click += (sender, args) => { menuState = MenuState.None; scene = new HalfSpace(); scene.BackToMenu += BackToTriangleMenu; };
             
-
             if (form != null)
-                form.Controls.Add(panel);
-            panel.Controls.Add(b);
+                form.Controls.Add(Globals.panel);
+            Globals.panel.Controls.Add(b);
         }
     }
 }
