@@ -13,8 +13,8 @@ namespace HumanGraphicsPipelineXna
 {
     abstract class Scene
     {
-        private Texture2D gridLine;
-        private Texture2D windowSpaceLine;
+        protected Texture2D gridLine;
+        protected Texture2D windowSpaceLine;
 
         protected bool animating = false;
         protected int animationCounter;
@@ -34,7 +34,7 @@ namespace HumanGraphicsPipelineXna
         public event ThisBackToMenu BackToMenu;
 
         protected abstract void DerivedInit();
-        protected abstract void ActionOnTriangleDraw(SpriteBatch spriteBatch);
+        //protected abstract void ActionOnTriangleDraw(SpriteBatch spriteBatch);
         protected abstract void LastPointPlaced(GameTime gameTime);
         protected abstract void StateChanges(GameTime gameTime);
 

@@ -20,14 +20,17 @@ namespace HumanGraphicsPipelineXna
         Button buttonBarycentric;
         Button buttonTriangleFilling;
 
+        Button buttonClipping;
+
         Scene scene;
         enum MenuState
         { 
             Main,
             TriangleFilling,
+            Clipping,
             None,
         }
-        MenuState menuState = MenuState.TriangleFilling;
+        MenuState menuState = MenuState.Main;
 
         public Game1()
         {
@@ -61,9 +64,14 @@ namespace HumanGraphicsPipelineXna
             buttonHalfSpace = new Button("Half-space", Fonts.font14, new Vector2(150, 50), new Vector2(Globals.viewportWidth/2-200, Globals.viewportHeight/2-25), Color.Red);
             buttonBarycentric = new Button("Barycentric", Fonts.font14, new Vector2(150, 50), new Vector2(Globals.viewportWidth/2+50, Globals.viewportHeight/2-25), Color.Red);
 
+            buttonClipping = new Button("Clipping", Fonts.font14, new Vector2(150, 50), new Vector2(200, 100), Color.Red);
+
             buttonTriangleFilling.OnClick += (b) => menuState = MenuState.TriangleFilling;
             buttonHalfSpace.OnClick += (b) => { menuState = MenuState.None; scene = new HalfSpace(); scene.BackToMenu += BackToTriangleMenu; };
             buttonBarycentric.OnClick += (b) => { menuState = MenuState.None; scene = new Barycentric(); scene.BackToMenu += BackToTriangleMenu; };
+        
+        
+            buttonClipping.OnClick += (b) => { menuState = MenuState.None; scene = new TriangleClippingScene(); scene.BackToMenu += BackToTriangleMenu; };
         }
 
         protected override void UnloadContent()
@@ -81,6 +89,7 @@ namespace HumanGraphicsPipelineXna
             {
                 case MenuState.Main:
                     buttonTriangleFilling.Update(gameTime);
+                    buttonClipping.Update(gameTime);
                     break;
                 case MenuState.TriangleFilling:
                     buttonHalfSpace.Update(gameTime);
@@ -116,6 +125,7 @@ namespace HumanGraphicsPipelineXna
         private void DrawMainMenu(SpriteBatch spriteBatch)
         {
             buttonTriangleFilling.Draw(spriteBatch);
+            buttonClipping.Draw(spriteBatch);
         }
 
         private void DrawTriangleFillingMenu(SpriteBatch spriteBatch)

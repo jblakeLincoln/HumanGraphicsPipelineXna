@@ -90,7 +90,7 @@ namespace HumanGraphicsPipelineXna
             }
         }
 
-        protected override void ActionOnTriangleDraw(Microsoft.Xna.Framework.Graphics.SpriteBatch spriteBatch)
+        protected void ActionOnTriangleDraw(Microsoft.Xna.Framework.Graphics.SpriteBatch spriteBatch)
         {
             boundingBox.Draw(spriteBatch);
             

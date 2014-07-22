@@ -77,8 +77,10 @@
     <Reference Include="System.Net" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Scenes\ClippingScene.cs" />
     <Compile Include="Scenes\Rasterising\Barycentric.cs" />
     <Compile Include="General\Button.cs" />
+    <Compile Include="Scenes\TriangleClippingScene.cs" />
     <Compile Include="Static\Fonts.cs" />
     <Compile Include="Static\Globals.cs" />
     <Compile Include="Scenes\Rasterising\HalfSpace.cs" />
