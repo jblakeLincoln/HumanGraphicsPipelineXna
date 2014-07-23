@@ -11,12 +11,12 @@ using Microsoft.Xna.Framework.Media;
 
 namespace HumanGraphicsPipelineXna
 {
-    class Barycentric : TriangleScene
+    class Barycentric : TriangleRasterisingScene
     {
         public Barycentric()
             : base()
-        { 
-        
+        {
+            drawGrid = true;
         }
 
         protected override void DrawText(SpriteBatch spriteBatch)

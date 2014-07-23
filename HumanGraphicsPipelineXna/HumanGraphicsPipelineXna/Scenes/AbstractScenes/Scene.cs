@@ -25,6 +25,7 @@ namespace HumanGraphicsPipelineXna
         protected Button buttonPlay;
         protected Button buttonReset;
         protected Button buttonBack;
+        protected bool drawGrid = false;
 
         protected enum State { Animated = 42, };
         protected int state = 0;
@@ -144,14 +145,18 @@ namespace HumanGraphicsPipelineXna
         {
 
             //Pixel grid
-            for (int i = 0; i <= (Globals.viewportHeight / Globals.pixelSize); i++)
-                spriteBatch.Draw(gridLine, new Rectangle(0, i * (Globals.viewportHeight / (Globals.viewportHeight / Globals.pixelSize)), Globals.viewportWidth, 1), Color.White);
 
-            for (int i = 0; i <= (Globals.viewportWidth / Globals.pixelSize); i++)
-                spriteBatch.Draw(gridLine, new Rectangle(i * (Globals.viewportWidth / (Globals.viewportWidth / Globals.pixelSize)), 0, 1, Globals.viewportHeight), Color.White);
-            
-            spriteBatch.Draw(windowSpaceLine, new Rectangle(Globals.viewportWidth / 2 - 2, 0, 4, Globals.viewportHeight), Color.White);
-            spriteBatch.Draw(windowSpaceLine, new Rectangle(0, Globals.viewportHeight / 2 - 2, (Globals.viewportWidth), 4), Color.White);
+            if (drawGrid)
+            {
+                for (int i = 0; i <= (Globals.viewportHeight / Globals.pixelSize); i++)
+                    spriteBatch.Draw(gridLine, new Rectangle(0, i * (Globals.viewportHeight / (Globals.viewportHeight / Globals.pixelSize)), Globals.viewportWidth, 1), Color.White);
+
+                for (int i = 0; i <= (Globals.viewportWidth / Globals.pixelSize); i++)
+                    spriteBatch.Draw(gridLine, new Rectangle(i * (Globals.viewportWidth / (Globals.viewportWidth / Globals.pixelSize)), 0, 1, Globals.viewportHeight), Color.White);
+
+                spriteBatch.Draw(windowSpaceLine, new Rectangle(Globals.viewportWidth / 2 - 2, 0, 4, Globals.viewportHeight), Color.White);
+                spriteBatch.Draw(windowSpaceLine, new Rectangle(0, Globals.viewportHeight / 2 - 2, (Globals.viewportWidth), 4), Color.White);
+            }
 
             /*//Screen space grid
             for (int i = 0; i <= 20; i++)

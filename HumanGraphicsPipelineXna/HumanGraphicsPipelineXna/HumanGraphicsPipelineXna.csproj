@@ -77,22 +77,23 @@
     <Reference Include="System.Net" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Scenes\ClippingScene.cs" />
+    <Compile Include="Objects\Polygon.cs" />
     <Compile Include="Scenes\Rasterising\Barycentric.cs" />
-    <Compile Include="General\Button.cs" />
-    <Compile Include="Scenes\TriangleClippingScene.cs" />
+    <Compile Include="Objects\Button.cs" />
+    <Compile Include="Scenes\Clipping\TriangleClippingScene.cs" />
+    <Compile Include="Scenes\Rasterising\TriangleRasterisingScene.cs" />
     <Compile Include="Static\Fonts.cs" />
     <Compile Include="Static\Globals.cs" />
     <Compile Include="Scenes\Rasterising\HalfSpace.cs" />
     <Compile Include="Static\Helper.cs" />
     <Compile Include="Static\Inputs.cs" />
-    <Compile Include="General\Line.cs" />
+    <Compile Include="Objects\Line.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Game1.cs" />
-    <Compile Include="Scenes\Scene.cs" />
-    <Compile Include="General\Square.cs" />
-    <Compile Include="Scenes\TriangleScene.cs" />
+    <Compile Include="Scenes\AbstractScenes\Scene.cs" />
+    <Compile Include="Objects\Square.cs" />
+    <Compile Include="Scenes\AbstractScenes\TriangleScene.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Game.ico" />

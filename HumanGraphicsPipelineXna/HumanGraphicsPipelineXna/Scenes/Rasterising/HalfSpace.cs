@@ -11,7 +11,7 @@ using Microsoft.Xna.Framework.Media;
 
 namespace HumanGraphicsPipelineXna
 {
-    class HalfSpace : TriangleScene
+    class HalfSpace : TriangleRasterisingScene
     {
         // Halfspace checks
         private float v0;
@@ -20,8 +20,8 @@ namespace HumanGraphicsPipelineXna
 
         public HalfSpace()
             : base()
-        { 
-        
+        {
+            drawGrid = true;
         }
 
         protected override void DerivedInit()
