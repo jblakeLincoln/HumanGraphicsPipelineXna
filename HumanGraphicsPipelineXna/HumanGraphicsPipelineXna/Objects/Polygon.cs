@@ -26,9 +26,9 @@ namespace HumanGraphicsPipelineXna
         int miniX;
         int miniY;
 
-        public Polygon(DPoint[] pointsIn, DColour col)
+        public Polygon(List<DPoint> pointsIn, DColour col)
         {
-            for (int i = 0; i < pointsIn.Length; i++)
+            for (int i = 0; i < pointsIn.Count; i++)
                 points.Add(pointsIn[i]);
 
             int minX=int.MaxValue;
@@ -41,12 +41,12 @@ namespace HumanGraphicsPipelineXna
             {
                 if (val.X < minX)
                     minX = val.X;
-                else if (val.X > maxX)
+                if (val.X > maxX)
                     maxX = val.X;
 
                 if (val.Y < minY)
                     minY = val.Y;
-                else if (val.Y > maxY)
+                if (val.Y > maxY)
                     maxY = val.Y;
             }
 

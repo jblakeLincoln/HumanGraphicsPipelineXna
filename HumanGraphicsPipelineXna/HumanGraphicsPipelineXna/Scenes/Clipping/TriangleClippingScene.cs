@@ -20,6 +20,59 @@ namespace HumanGraphicsPipelineXna
 {
     class TriangleClippingScene : TriangleScene
     {
+        enum Side
+        { 
+            Up,
+            Left,
+            Down,
+            Right,
+            TL,
+            TR,
+            BL,
+            BR
+        }
+
+        class ClippingPoint
+        {
+            public Vector2 triPoint;
+            public List<Vector2> intersectionPoints = new List<Vector2>();
+            public bool isOutside = false;
+
+            public Side side;
+
+            void setIsOutside(bool t) { isOutside = t; }
+
+            public ClippingPoint(Vector2 triPointIn, Vector2 normalisedPointIn, List<Vector2> intersectionPointsIn) 
+            {
+                intersectionPoints = intersectionPointsIn;
+                triPoint = triPointIn;
+
+                if (normalisedPointIn.X < -1 && normalisedPointIn.Y > 1)
+                    side = Side.TL;
+                else if (normalisedPointIn.X > 1 && normalisedPointIn.Y > 1)
+                    side = Side.TR;
+                else if (normalisedPointIn.X < -1 && normalisedPointIn.Y < -1)
+                    side = Side.BL;
+                else if (normalisedPointIn.X > 1 && normalisedPointIn.Y < -1)
+                    side = Side.BR;
+
+                else if (normalisedPointIn.X < -1)
+                    side = Side.Left;
+                else if (normalisedPointIn.X > 1)
+                    side = Side.Right;
+                else if (normalisedPointIn.Y > 1)
+                    side = Side.Up;
+                else if (normalisedPointIn.Y < -1)
+                    side = Side.Down;
+
+                int p = 3;
+                p = 5;
+            }
+
+            
+        }
+
+
         static Vector2 pointTopLeft = new Vector2(Globals.viewportWidth / 6, Globals.viewportHeight / 6);
         static Vector2 pointTopRight = new Vector2(Globals.viewportWidth - (Globals.viewportWidth / 6), Globals.viewportHeight / 6);
         static Vector2 pointBottomLeft = new Vector2(Globals.viewportWidth / 6, Globals.viewportHeight - (Globals.viewportHeight / 6));
@@ -43,6 +96,11 @@ namespace HumanGraphicsPipelineXna
             pointBottomLeft, pointBottomRight, // Bottom
             pointTopRight, pointBottomRight}; // Right
 
+        ClippingPoint clippingA;
+        ClippingPoint clippingB;
+        ClippingPoint clippingC;
+
+
         protected override void DerivedInit()
         {
             base.DerivedInit();
@@ -65,6 +123,18 @@ namespace HumanGraphicsPipelineXna
             intersectionPointAB2 = new Vector2(float.NegativeInfinity);
             intersectionPointBC2 = new Vector2(float.NegativeInfinity);
             intersectionPointAC2 = new Vector2(float.NegativeInfinity);
+
+            outsideCount = 0;
+            isOutsideA = false;
+            isOutsideB = false;
+            isOutsideC = false;
+
+            clippingA = null;
+            clippingB = null;
+            clippingC = null;
+
+            insideTriPoints = null;
+            outsideTriPoints = null;
 
         }
 
@@ -158,9 +228,46 @@ namespace HumanGraphicsPipelineXna
         Square squareIntersectionAC2;
 
 
+        bool isOutsideA = false;
+        bool isOutsideB = false;
+        bool isOutsideC = false;
+        int outsideCount = 0;
+
+        List<ClippingPoint> insideTriPoints;
+        List<ClippingPoint> outsideTriPoints;
+        List<Vector2> intersectionsC;
+        List<Vector2> intersectionsA;
+        List<Vector2> intersectionsB;
+
+
         protected override void LastPointPlaced(GameTime gameTime)
         {
+
+            intersectionsC = new List<Vector2>();
+            intersectionsA = new List<Vector2>();
+            intersectionsB = new List<Vector2>();
             CorrectNormalisedTriangle(3);
+
+            isOutsideA = (Math.Abs(normalisedTrianglePoints[0].X) >= 1 || Math.Abs(normalisedTrianglePoints[0].Y) >= 1) ? true : false;
+            isOutsideB = (Math.Abs(normalisedTrianglePoints[1].X) >= 1 || Math.Abs(normalisedTrianglePoints[1].Y) >= 1) ? true : false;
+            isOutsideC = (Math.Abs(normalisedTrianglePoints[2].X) >= 1 || Math.Abs(normalisedTrianglePoints[2].Y) >= 1) ? true : false;
+
+            Console.WriteLine("A: " + isOutsideA);
+            Console.WriteLine("B: " + isOutsideB);
+            Console.WriteLine("C: " + isOutsideC + "\n");
+
+            outsideCount = 0;
+
+            
+            /*
+            if (isOutsideA)
+                outsideTriPoints.Add(trianglePoints[0]);
+            if (isOutsideB)
+                outsideTriPoints.Add(trianglePoints[1]);
+            if (isOutsideC)
+                outsideTriPoints.Add(trianglePoints[2]);
+            */
+            /*
             for (int i = 0; i < 8; i+=2)
             {
                 if (!intersectionAB1)
@@ -178,14 +285,171 @@ namespace HumanGraphicsPipelineXna
                 else if (!intersectionAC2)
                     intersectionAC2 = CheckLineIntersection(trianglePoints[2], trianglePoints[0], l[i], l[i + 1], out intersectionPointAC2);
 
+            }*/
+
+            for (int i = 0; i < 8; i+=2)
+            {
+                bool b;
+                Vector2 v;
+
+                b = CheckLineIntersection(trianglePoints[0], trianglePoints[1], l[i], l[i + 1], out v);
+                intersectionsA.Add(v);
+
+                b = CheckLineIntersection(trianglePoints[1], trianglePoints[2], l[i], l[i + 1], out v);
+                intersectionsB.Add(v);
+
+                b = CheckLineIntersection(trianglePoints[2], trianglePoints[0], l[i], l[i + 1], out v);
+                intersectionsC.Add(v);
             }
 
+            intersectionsA = intersectionsA.Distinct().ToList();
+            intersectionsA.Remove(new Vector2(float.NegativeInfinity));
+
+            intersectionsB = intersectionsB.Distinct().ToList();
+            intersectionsB.Remove(new Vector2(float.NegativeInfinity));
+
+            intersectionsC = intersectionsC.Distinct().ToList();
+            intersectionsC.Remove(new Vector2(float.NegativeInfinity));
+
+            /*
+            if (intersectionAB1)
+                intersectionsA.Add(intersectionPointAB1);
+            if (intersectionAC1)
+                intersectionsA.Add(intersectionPointAC1);
+
+            if (intersectionBC1)
+                intersectionsB.Add(intersectionPointBC1);
+            if (intersectionAB2)
+                intersectionsB.Add(intersectionPointAB2);
+
+            if (intersectionAC1)
+                intersectionsC.Add(intersectionPointAC1);
+            if (intersectionAB2)
+                intersectionsC.Add(intersectionPointAB2);
+
+
+            */
+            if (intersectionsA.Count > 1)
+            { 
+                float d1;
+                float d2;
+                Vector2 v1 = intersectionsA[0];
+                Vector2 v2 = intersectionsA[1];
+                Vector2 t1 = trianglePoints[0];
+                Vector2.Distance(ref v1, ref v2, out d1);
+                Vector2.Distance(ref v1, ref t1, out d2);
+                if (d1 < d2)
+                {
+                    Vector2 temp = intersectionsA[0];
+                    intersectionsA[0] = intersectionsA[1];
+                    intersectionsA[1] = temp;
+                }
+            }
+
+
+            if (intersectionsB.Count > 1)
+            {
+                float d1;
+                float d2;
+                Vector2 v1 = intersectionsB[0];
+                Vector2 v2 = intersectionsB[1];
+                Vector2 t1 = trianglePoints[0];
+                Vector2.Distance(ref v1, ref v2, out d1);
+                Vector2.Distance(ref v1, ref t1, out d2);
+                if (d1 < d2)
+                {
+                    Vector2 temp = intersectionsB[0];
+                    intersectionsB[0] = intersectionsB[1];
+                    intersectionsB[1] = temp;
+                }
+            }
+
+
+            if (intersectionsC.Count > 1)
+            {
+                float d1;
+                float d2;
+                Vector2 v1 = intersectionsC[0];
+                Vector2 v2 = intersectionsC[1];
+                Vector2 t1 = trianglePoints[0];
+                Vector2.Distance(ref v1, ref v2, out d1);
+                Vector2.Distance(ref v1, ref t1, out d2);
+                if (d1 < d2)
+                {
+                    Vector2 temp = intersectionsC[0];
+                    intersectionsC[0] = intersectionsC[1];
+                    intersectionsC[1] = temp;
+                }
+            }
+
+            insideTriPoints = new List<ClippingPoint>();
+            outsideTriPoints = new List<ClippingPoint>();
+
+
+
+
+
+            List<Vector2> intersectionPoints = new List<Vector2>();
+            if (intersectionAB1)
+                intersectionPoints.Add(intersectionsA.First());
+            if (intersectionAC1)
+                intersectionPoints.Add(intersectionsC.Last());
+
+            clippingA = new ClippingPoint(trianglePoints[0], normalisedTrianglePoints[0], intersectionsA);
+            clippingA.isOutside = isOutsideA;
+
+            if (isOutsideA)
+                outsideTriPoints.Add(clippingA);
+            else
+                insideTriPoints.Add(clippingA);
+
+
+
+
+            intersectionPoints = new List<Vector2>();
+            if (intersectionAB1)
+                intersectionPoints.Add(intersectionsA.First());
+            if (intersectionBC1)
+                intersectionPoints.Add(intersectionsB.Last());
+
+            
+            clippingB = new ClippingPoint(trianglePoints[1], normalisedTrianglePoints[1], intersectionsB);
+            clippingB.isOutside = isOutsideB;
+
+            if (isOutsideB)
+                outsideTriPoints.Add(clippingB);
+            else
+                insideTriPoints.Add(clippingB);
+
+
+
+
+
+            intersectionPoints = new List<Vector2>();
+            if (intersectionBC1)
+                intersectionPoints.Add(intersectionsB.First());
+            if (intersectionAC1)
+                intersectionPoints.Add(intersectionsC.Last());
+
+            clippingC = new ClippingPoint(trianglePoints[2], normalisedTrianglePoints[2], intersectionsC);
+            clippingC.isOutside = isOutsideC;
+
+            if (isOutsideC)
+                outsideTriPoints.Add(clippingC);
+            else
+                insideTriPoints.Add(clippingC);
+
+
+
+
+
+
             squareIntersectionAB1 = new Square(new Vector2(intersectionPointAB1.X - 2, intersectionPointAB1.Y - 2), new Vector2(4, 4), XColour.Red);
-            squareIntersectionBC1 = new Square(new Vector2(intersectionPointBC1.X - 2, intersectionPointBC1.Y - 2), new Vector2(4, 4), XColour.Red);
-            squareIntersectionAC1 = new Square(new Vector2(intersectionPointAC1.X - 2, intersectionPointAC1.Y - 2), new Vector2(4, 4), XColour.Red);
-            squareIntersectionAB2 = new Square(new Vector2(intersectionPointAB2.X - 2, intersectionPointAB2.Y - 2), new Vector2(4, 4), XColour.Blue);
-            squareIntersectionBC2 = new Square(new Vector2(intersectionPointBC2.X - 2, intersectionPointBC2.Y - 2), new Vector2(4, 4), XColour.Blue);
-            squareIntersectionAC2 = new Square(new Vector2(intersectionPointAC2.X - 2, intersectionPointAC2.Y - 2), new Vector2(4, 4), XColour.Blue);
+            squareIntersectionBC1 = new Square(new Vector2(intersectionPointBC1.X - 2, intersectionPointBC1.Y - 2), new Vector2(4, 4), XColour.Green);
+            squareIntersectionAC1 = new Square(new Vector2(intersectionPointAC1.X - 2, intersectionPointAC1.Y - 2), new Vector2(4, 4), XColour.LightBlue);
+            squareIntersectionAB2 = new Square(new Vector2(intersectionPointAB2.X - 2, intersectionPointAB2.Y - 2), new Vector2(4, 4), XColour.Yellow);
+            squareIntersectionBC2 = new Square(new Vector2(intersectionPointBC2.X - 2, intersectionPointBC2.Y - 2), new Vector2(4, 4), XColour.Pink);
+            squareIntersectionAC2 = new Square(new Vector2(intersectionPointAC2.X - 2, intersectionPointAC2.Y - 2), new Vector2(4, 4), XColour.Brown);
         }
 
         protected override void DrawOnAnimate(SpriteBatch spriteBatch)
@@ -198,6 +462,9 @@ namespace HumanGraphicsPipelineXna
             
         }
 
+        
+
+        Polygon t;
         public override void Draw(SpriteBatch spriteBatch)
         {
             base.Draw(spriteBatch);
@@ -220,6 +487,163 @@ namespace HumanGraphicsPipelineXna
                 squareIntersectionBC2.Draw(spriteBatch);
             if (squareIntersectionAC2 != null)
                 squareIntersectionAC2.Draw(spriteBatch);
+
+            /*
+            if (clippingA != null)
+            {
+                if (clippingA.isOutside)
+                {
+                    List<DPoint> p = new List<DPoint>();
+
+                    p.Add(new DPoint((int)clippingB.triPoint.X, (int)clippingB.triPoint.Y));
+                    p.Add(new DPoint((int)clippingC.intersectionPoints[0].X, (int)clippingC.intersectionPoints[0].Y));
+                    p.Add(new DPoint((int)clippingB.intersectionPoints[0].X, (int)clippingB.intersectionPoints[0].Y));
+
+                    Polygon t = new Polygon(p, DColour.Red);
+                    t.Draw(spriteBatch);
+                }
+            }*/
+
+            if (outsideTriPoints != null)
+            {
+                if (outsideTriPoints.Count == 1)
+                {
+                    /*
+                    List<DPoint> points = new List<DPoint>();
+
+                    points.Add(new DPoint((int)insideTriPoints[0].triPoint.X, (int)insideTriPoints[0].triPoint.Y));
+                    points.Add(new DPoint((int)insideTriPoints[0].intersectionPoints[0].X, (int)insideTriPoints[0].intersectionPoints[0].Y));
+                    points.Add(new DPoint((int)insideTriPoints[1].intersectionPoints[0].X, (int)insideTriPoints[1].intersectionPoints[0].Y));
+
+                    Polygon t = new Polygon(points, DColour.Red);
+                    t.Draw(spriteBatch);
+
+                    points = new List<DPoint>();
+
+                    points.Add(new DPoint((int)insideTriPoints[0].triPoint.X, (int)insideTriPoints[0].triPoint.Y));
+                    points.Add(new DPoint((int)insideTriPoints[1].triPoint.X, (int)insideTriPoints[1].triPoint.Y));
+                    points.Add(new DPoint((int)insideTriPoints[1].intersectionPoints[0].X, (int)insideTriPoints[1].intersectionPoints[0].Y));
+
+                    Polygon q = new Polygon(points, DColour.Red);
+                    q.Draw(spriteBatch);
+                     * */
+                }
+                else if (outsideTriPoints.Count == 2)
+                {
+
+                    if (outsideTriPoints[0].side == Side.Down && outsideTriPoints[1].side == Side.Right)
+                    {
+                        ClippingPoint temp = outsideTriPoints[1];
+                        outsideTriPoints[1] = outsideTriPoints[0];
+                        outsideTriPoints[0] = temp;
+                    }
+                    int index = 0;
+                    int notIndex = 0;
+                    if (outsideTriPoints[0].intersectionPoints.Count < 1)
+                        index = 1;
+                    else
+                        notIndex = 1;
+                    List<DPoint> points = new List<DPoint>();
+                    points.Add(new DPoint((int)outsideTriPoints[index].intersectionPoints[0].X, (int)outsideTriPoints[index].intersectionPoints[0].Y));
+                    points.Add(new DPoint((int)insideTriPoints[0].intersectionPoints[0].X, (int)insideTriPoints[0].intersectionPoints[0].Y));
+                    points.Add(new DPoint((int)insideTriPoints[0].triPoint.X, (int)insideTriPoints[0].triPoint.Y));
+
+
+                    Polygon t = new Polygon(points, DColour.Yellow);
+                    t.Draw(spriteBatch);
+
+                    if (outsideTriPoints[0].side != outsideTriPoints[1].side)
+                    {
+                        
+                        if (outsideTriPoints[index].intersectionPoints.Count < 1)
+                        {
+                            int temp = index;
+                            index = notIndex;
+                            notIndex = temp;
+                            
+                        }
+
+                        if (outsideTriPoints[index].intersectionPoints.Count > 1)
+                        {
+
+                            points = new List<DPoint>();
+                            points.Add(new DPoint((int)outsideTriPoints[index].intersectionPoints[0].X, (int)outsideTriPoints[index].intersectionPoints[0].Y));
+                            points.Add(new DPoint((int)outsideTriPoints[index].intersectionPoints[1].X, (int)outsideTriPoints[index].intersectionPoints[1].Y));
+                            points.Add(new DPoint((int)insideTriPoints[0].triPoint.X, (int)insideTriPoints[0].triPoint.Y));
+
+
+                            Polygon q = new Polygon(points, DColour.Red);
+                            q.Draw(spriteBatch);
+
+                            points = new List<DPoint>();
+                            points.Add(new DPoint((int)outsideTriPoints[index].intersectionPoints[1].X, (int)outsideTriPoints[index].intersectionPoints[1].Y));
+                            points.Add(new DPoint((int)outsideTriPoints[notIndex].intersectionPoints[0].X, (int)outsideTriPoints[notIndex].intersectionPoints[0].Y));
+                            points.Add(new DPoint((int)insideTriPoints[0].triPoint.X, (int)insideTriPoints[0].triPoint.Y));
+
+
+                            Polygon m = new Polygon(points, DColour.Blue);
+                            m.Draw(spriteBatch);
+                        }
+
+                    }
+
+
+                    if (outsideTriPoints[0].intersectionPoints.Count > 1 && outsideTriPoints[1].intersectionPoints.Count > 1)
+                    {
+
+                        // Middle
+
+                        /*
+                        List<DPoint> points = new List<DPoint>();
+                        points.Add(new DPoint((int)outsideTriPoints[0].intersectionPoints[0].X, (int)outsideTriPoints[0].intersectionPoints[0].Y));
+                        points.Add(new DPoint((int)outsideTriPoints[0].intersectionPoints[1].X, (int)outsideTriPoints[0].intersectionPoints[1].Y));
+                        points.Add(new DPoint((int)outsideTriPoints[1].intersectionPoints[1].X, (int)outsideTriPoints[1].intersectionPoints[1].Y));
+
+
+                        Polygon t = new Polygon(points, DColour.Red);
+                        t.Draw(spriteBatch);
+
+
+
+                        List<DPoint> points2 = new List<DPoint>();
+
+                        points2.Add(new DPoint((int)outsideTriPoints[0].intersectionPoints[0].X, (int)outsideTriPoints[0].intersectionPoints[0].Y));
+                        points2.Add(new DPoint((int)outsideTriPoints[0].intersectionPoints[1].X, (int)outsideTriPoints[0].intersectionPoints[1].Y));
+                        points2.Add(new DPoint((int)outsideTriPoints[1].intersectionPoints[0].X, (int)outsideTriPoints[1].intersectionPoints[0].Y));
+                        
+                        
+
+
+                        Polygon q = new Polygon(points2, DColour.Green);
+                        q.Draw(spriteBatch);
+                         * 
+                         * */
+
+                        
+
+                    }
+                    
+
+                    /*
+                    List<DPoint> points = new List<DPoint>();
+
+                    points.Add(new DPoint((int)insideTriPoints[0].triPoint.X, (int)insideTriPoints[0].triPoint.Y));
+                    points.Add(new DPoint((int)outsideTriPoints[0].intersectionPoints[0].X, (int)outsideTriPoints[0].intersectionPoints[0].Y));
+                    points.Add(new DPoint((int)outsideTriPoints[1].intersectionPoints[0].X, (int)outsideTriPoints[1].intersectionPoints[0].Y));
+
+                    Polygon t = new Polygon(points, DColour.Red);
+                    t.Draw(spriteBatch);
+
+                    points = new List<DPoint>();*/
+
+                   // points.Add(new DPoint((int)insideTriPoints[0].triPoint.X, (int)insideTriPoints[0].triPoint.Y));
+                    //points.Add(new DPoint((int)insideTriPoints[1].triPoint.X, (int)insideTriPoints[1].triPoint.Y));
+                   // points.Add(new DPoint((int)insideTriPoints[1].intersectionPoints[0].X, (int)insideTriPoints[1].intersectionPoints[0].Y));
+
+                    //Polygon q = new Polygon(points, DColour.Red);
+                    //q.Draw(spriteBatch);
+                }
+            }
 
 
             if (intersectionAB1 && intersectionAB2 && intersectionBC1)
