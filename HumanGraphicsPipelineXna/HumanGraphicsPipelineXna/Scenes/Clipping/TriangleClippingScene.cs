@@ -35,16 +35,18 @@ namespace HumanGraphicsPipelineXna
         class ClippingPoint
         {
             public Vector2 triPoint;
-            public List<Vector2> intersectionPoints = new List<Vector2>();
+            public List<Vector2> intersectionPointsTo = new List<Vector2>();
+            public List<Vector2> intersectionPointsFrom = new List<Vector2>();
             public bool isOutside = false;
 
             public Side side;
 
             void setIsOutside(bool t) { isOutside = t; }
 
-            public ClippingPoint(Vector2 triPointIn, Vector2 normalisedPointIn, List<Vector2> intersectionPointsIn) 
+            public ClippingPoint(Vector2 triPointIn, Vector2 normalisedPointIn, List<Vector2> intersectionPointsToIn, List<Vector2> intersectionPointsFromIn) 
             {
-                intersectionPoints = intersectionPointsIn;
+                intersectionPointsTo = intersectionPointsToIn;
+                intersectionPointsFrom = intersectionPointsFromIn;
                 triPoint = triPointIn;
 
                 if (normalisedPointIn.X < -1 && normalisedPointIn.Y > 1)
@@ -389,13 +391,14 @@ namespace HumanGraphicsPipelineXna
 
 
 
-            List<Vector2> intersectionPoints = new List<Vector2>();
-            if (intersectionAB1)
-                intersectionPoints.Add(intersectionsA.First());
-            if (intersectionAC1)
-                intersectionPoints.Add(intersectionsC.Last());
+            List<Vector2> tempIntersectionsTo = new List<Vector2>();
+            List<Vector2> tempIntersectionsFrom = new List<Vector2>();
+            //if (intersectionAB1)
+                tempIntersectionsFrom.AddRange(intersectionsA);
+            //if (intersectionAC1)
+                tempIntersectionsTo.AddRange(intersectionsC);
 
-            clippingA = new ClippingPoint(trianglePoints[0], normalisedTrianglePoints[0], intersectionsA);
+            clippingA = new ClippingPoint(trianglePoints[0], normalisedTrianglePoints[0], tempIntersectionsTo, tempIntersectionsFrom);
             clippingA.isOutside = isOutsideA;
 
             if (isOutsideA)
@@ -406,14 +409,16 @@ namespace HumanGraphicsPipelineXna
 
 
 
-            intersectionPoints = new List<Vector2>();
-            if (intersectionAB1)
-                intersectionPoints.Add(intersectionsA.First());
-            if (intersectionBC1)
-                intersectionPoints.Add(intersectionsB.Last());
+            tempIntersectionsTo = new List<Vector2>();
+            tempIntersectionsFrom = new List<Vector2>();
+            //if (intersectionBC1)
+                tempIntersectionsFrom.AddRange(intersectionsB);
+            //if (intersectionAB1)
+                tempIntersectionsTo.AddRange(intersectionsA);
+            
 
             
-            clippingB = new ClippingPoint(trianglePoints[1], normalisedTrianglePoints[1], intersectionsB);
+            clippingB = new ClippingPoint(trianglePoints[1], normalisedTrianglePoints[1], tempIntersectionsTo, tempIntersectionsFrom);
             clippingB.isOutside = isOutsideB;
 
             if (isOutsideB)
@@ -425,13 +430,14 @@ namespace HumanGraphicsPipelineXna
 
 
 
-            intersectionPoints = new List<Vector2>();
-            if (intersectionBC1)
-                intersectionPoints.Add(intersectionsB.First());
-            if (intersectionAC1)
-                intersectionPoints.Add(intersectionsC.Last());
+            tempIntersectionsTo = new List<Vector2>();
+            tempIntersectionsFrom = new List<Vector2>();
+            //if (intersectionBC1)
+                tempIntersectionsTo.AddRange(intersectionsB);
+            //if (intersectionAC1)
+                tempIntersectionsFrom.AddRange(intersectionsC);
 
-            clippingC = new ClippingPoint(trianglePoints[2], normalisedTrianglePoints[2], intersectionsC);
+            clippingC = new ClippingPoint(trianglePoints[2], normalisedTrianglePoints[2], tempIntersectionsTo, tempIntersectionsFrom);
             clippingC.isOutside = isOutsideC;
 
             if (isOutsideC)
@@ -462,6 +468,22 @@ namespace HumanGraphicsPipelineXna
             
         }
 
+
+        protected bool CheckListEquality<T>(List<T> a, List<T> b)
+        {
+            if (a.Count == b.Count)
+            {
+                for (int i = 0; i < a.Count; i++)
+                { 
+                    if (!a[i].Equals(b[i]))
+                        return false;
+                }
+            }
+            else
+                return false;
+
+            return true;
+        }
         
 
         Polygon t;
@@ -504,10 +526,31 @@ namespace HumanGraphicsPipelineXna
                 }
             }*/
 
+
+            
+
+
             if (outsideTriPoints != null)
             {
+
+                
+
+
                 if (outsideTriPoints.Count == 1)
                 {
+                    int index = 1;
+
+
+                        if (insideTriPoints[1].intersectionPointsTo.Count != 0 
+                            && outsideTriPoints[0].intersectionPointsFrom[0] == insideTriPoints[1].intersectionPointsTo[0])
+                            index = 0;
+
+
+                    Line ll = new Line(outsideTriPoints[0].intersectionPointsFrom[0], insideTriPoints[index].triPoint, XColour.Red, 3f);
+
+                    ll.Draw(spriteBatch);
+   
+
                     /*
                     List<DPoint> points = new List<DPoint>();
 
@@ -530,6 +573,25 @@ namespace HumanGraphicsPipelineXna
                 }
                 else if (outsideTriPoints.Count == 2)
                 {
+                    if (outsideTriPoints[0].intersectionPointsFrom.Count == 0
+                    && outsideTriPoints[1].intersectionPointsTo.Count == 0)
+                    {
+                        /*List<DPoint> p = new List<DPoint>{ new DPoint((int)insideTriPoints[0].intersectionPointsFrom[0].X, (int)insideTriPoints[0].intersectionPointsFrom[0].Y),
+                                        new DPoint((int)insideTriPoints[0].intersectionPointsTo[0].X, (int)insideTriPoints[0].intersectionPointsTo[0].Y),
+                                            new DPoint((int)insideTriPoints[0].triPoint.X, (int)insideTriPoints[0].triPoint.Y)};
+
+                        Polygon pp = new Polygon(p, DColour.Red);
+
+                        pp.Draw(spriteBatch);*/
+
+
+                        Line l1 = new Line(insideTriPoints[0].intersectionPointsTo[0], insideTriPoints[0].intersectionPointsFrom[0], XColour.Green, 3f);
+                        l1.Draw(spriteBatch);
+
+                        
+                    }
+                    
+                    /*
 
                     if (outsideTriPoints[0].side == Side.Down && outsideTriPoints[1].side == Side.Right)
                     {
@@ -621,7 +683,7 @@ namespace HumanGraphicsPipelineXna
 
                         
 
-                    }
+                    //}
                     
 
                     /*
