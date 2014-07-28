@@ -632,7 +632,8 @@ namespace HumanGraphicsPipelineXna
                         Line l1 = new Line(outsideTriPoints[index].intersectionPointsFrom[0], insideTriPoints[0].triPoint, XColour.Red, 2f);
                         Line l3;
                         Vector2 v;
-                        if (index == 0)
+                        if ((insideTriPoints[0].intersectionPointsFrom[0].X == outsideTriPoints[index].intersectionPointsFrom[0].X) ||
+                            insideTriPoints[0].intersectionPointsFrom[0].Y == outsideTriPoints[index].intersectionPointsFrom[0].Y)
                         {
                             v = insideTriPoints[0].intersectionPointsTo[0];//outsideTriPoints[index].intersectionPointsFrom[0];
                         }
