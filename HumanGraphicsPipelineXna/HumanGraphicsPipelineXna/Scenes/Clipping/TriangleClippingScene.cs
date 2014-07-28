@@ -532,10 +532,6 @@ namespace HumanGraphicsPipelineXna
 
             if (outsideTriPoints != null)
             {
-
-                
-
-
                 if (outsideTriPoints.Count == 1)
                 {
                     int index = 1;
@@ -573,8 +569,8 @@ namespace HumanGraphicsPipelineXna
                 }
                 else if (outsideTriPoints.Count == 2)
                 {
-                    if (outsideTriPoints[0].intersectionPointsFrom.Count == 0
-                    && outsideTriPoints[1].intersectionPointsTo.Count == 0)
+                    if ((outsideTriPoints[0].intersectionPointsFrom.Count == 0 && outsideTriPoints[1].intersectionPointsTo.Count == 0) ||
+                        (outsideTriPoints[1].intersectionPointsFrom.Count == 0 && outsideTriPoints[0].intersectionPointsTo.Count == 0))
                     {
                         /*List<DPoint> p = new List<DPoint>{ new DPoint((int)insideTriPoints[0].intersectionPointsFrom[0].X, (int)insideTriPoints[0].intersectionPointsFrom[0].Y),
                                         new DPoint((int)insideTriPoints[0].intersectionPointsTo[0].X, (int)insideTriPoints[0].intersectionPointsTo[0].Y),
@@ -584,11 +580,69 @@ namespace HumanGraphicsPipelineXna
 
                         pp.Draw(spriteBatch);*/
 
+                        Line l1;
+                        if (insideTriPoints[0].intersectionPointsFrom[0].X != insideTriPoints[0].intersectionPointsTo[0].X &&
+                            insideTriPoints[0].intersectionPointsFrom[0].Y != insideTriPoints[0].intersectionPointsTo[0].Y)
+                        {
+                            l1 = new Line(insideTriPoints[0].intersectionPointsTo[0], insideTriPoints[0].intersectionPointsFrom[0], XColour.Green, 3f);
+                            l1.Draw(spriteBatch);
+                        }
+                        else
+                        {
+                            List<DPoint> d = new List<DPoint>{new DPoint((int)insideTriPoints[0].intersectionPointsFrom[0].X, (int)insideTriPoints[0].intersectionPointsFrom[0].Y),
+                                             new DPoint((int)insideTriPoints[0].intersectionPointsTo[0].X, (int)insideTriPoints[0].intersectionPointsTo[0].Y),
+                                             new DPoint((int)insideTriPoints[0].triPoint.X, (int)insideTriPoints[0].triPoint.Y)};
+                            Polygon p = new Polygon(d, DColour.Red);
+                            p.Draw(spriteBatch);
+                        }
 
-                        Line l1 = new Line(insideTriPoints[0].intersectionPointsTo[0], insideTriPoints[0].intersectionPointsFrom[0], XColour.Green, 3f);
+
+
+                    }
+                    else
+                    {
+
+                        //Not book method, but works?
+                        /*
+                        int index = 0;
+
+                        if (outsideTriPoints[0].intersectionPointsFrom.Count < outsideTriPoints[1].intersectionPointsFrom.Count)
+                            index = 1;
+                        Line l1 = new Line(outsideTriPoints[index].intersectionPointsFrom[0], insideTriPoints[0].triPoint, XColour.Green, 2f);
+                        Line l2 = new Line(outsideTriPoints[index].intersectionPointsFrom[1], insideTriPoints[0].triPoint, XColour.Green, 2f);
+
                         l1.Draw(spriteBatch);
+                        l2.Draw(spriteBatch);
+                        /*
+                        List<DPoint> d1 = new List<DPoint> { new DPoint((int)outsideTriPoints[index].intersectionPointsFrom[0].X, (int)outsideTriPoints[index].intersectionPointsFrom[0].Y),
+                                                            new DPoint((int)outsideTriPoints[index].intersectionPointsFrom[1].X, (int)outsideTriPoints[index].intersectionPointsFrom[1].Y),
+                                                            new DPoint((int)insideTriPoints[0].
+                                    };
+                         * */
 
-                        
+
+
+                        int index = 0;
+                        int notIndex;
+                        if (outsideTriPoints[0].intersectionPointsFrom.Count < outsideTriPoints[1].intersectionPointsFrom.Count)
+                            index = 1;
+
+                        notIndex = (index == 0) ? 1 : 0;
+
+                        Line l1 = new Line(outsideTriPoints[index].intersectionPointsFrom[0], insideTriPoints[0].triPoint, XColour.Red, 2f);
+                        Line l3;
+                        Vector2 v;
+                        if (index == 0)
+                        {
+                            v = insideTriPoints[0].intersectionPointsTo[0];//outsideTriPoints[index].intersectionPointsFrom[0];
+                        }
+                        else
+                            v = insideTriPoints[0].intersectionPointsFrom[0];
+
+                        l3 = new Line(outsideTriPoints[index].intersectionPointsFrom[0], v, XColour.Green, 2f);
+                        l1.Draw(spriteBatch);
+                        if (l3 != null)
+                            l3.Draw(spriteBatch);
                     }
                     
                     /*
@@ -705,8 +759,16 @@ namespace HumanGraphicsPipelineXna
                     //Polygon q = new Polygon(points, DColour.Red);
                     //q.Draw(spriteBatch);
                 }
-            }
+                else if (outsideTriPoints.Count == 3)
+                {
+                    Line l1 = new Line(outsideTriPoints[0].intersectionPointsFrom[0], outsideTriPoints[1].intersectionPointsFrom[0], XColour.Green, 2f);
+                    Line l2 = new Line(outsideTriPoints[0].intersectionPointsTo[0], outsideTriPoints[1].intersectionPointsFrom[0], XColour.Green, 2f);
 
+                    l1.Draw(spriteBatch);
+                    l2.Draw(spriteBatch);
+                }
+            }
+            
 
             if (intersectionAB1 && intersectionAB2 && intersectionBC1)
             {                
