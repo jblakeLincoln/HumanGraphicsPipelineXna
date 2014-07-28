@@ -94,8 +94,8 @@ namespace HumanGraphicsPipelineXna
 
         List<Vector2> l = new List<Vector2>() {
             pointTopLeft, pointTopRight, // Top
-            pointTopLeft, pointBottomLeft, // Left
-            pointBottomLeft, pointBottomRight, // Bottom
+            pointBottomLeft, pointTopLeft, // Left
+            pointBottomRight, pointBottomLeft, // Bottom
             pointTopRight, pointBottomRight}; // Right
 
         ClippingPoint clippingA;
@@ -654,12 +654,21 @@ namespace HumanGraphicsPipelineXna
             for (int i = 1; i < points.Count; i++)
             {
                 v.Add(orient2d(points[i - 1], points[i], p));
-                if (v.Last() < 0)
-                    return false;
             }
             v.Add(orient2d(points[points.Count-1], points[0], p));
-            if (v.Last() < 0)
-                return false;
+
+            bool negative = false;
+
+            if (v[0] < 0)
+                negative = true;
+
+            for (int i = 0; i < v.Count; i++)
+            {
+                if (negative && v[i] >= 0)
+                    return false;
+                else if (!negative && v[i] < 0)
+                    return false;
+            }
 
 
             return true;
