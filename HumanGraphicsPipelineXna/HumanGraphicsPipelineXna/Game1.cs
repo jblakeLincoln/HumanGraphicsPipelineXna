@@ -60,18 +60,20 @@ namespace HumanGraphicsPipelineXna
 
         public void SetButtons()
         {
-            buttonTriangleFilling = new Button("Triangle filling", Fonts.font14, new Vector2(150, 50), new Vector2(10, 10), Color.Red);
+            buttonTriangleFilling = new Button("Triangle\n filling", Fonts.font14, new Vector2(150, 50), new Vector2(Globals.viewportWidth / 2 - 200, Globals.viewportHeight / 2 - 25), Color.Red);
+            buttonClipping = new Button("Clipping", Fonts.font14, new Vector2(150, 50), new Vector2(Globals.viewportWidth / 2 + 50, Globals.viewportHeight / 2 - 25), Color.Red);
+
             buttonHalfSpace = new Button("Half-space", Fonts.font14, new Vector2(150, 50), new Vector2(Globals.viewportWidth/2-200, Globals.viewportHeight/2-25), Color.Red);
             buttonBarycentric = new Button("Barycentric", Fonts.font14, new Vector2(150, 50), new Vector2(Globals.viewportWidth/2+50, Globals.viewportHeight/2-25), Color.Red);
 
-            buttonClipping = new Button("Clipping", Fonts.font14, new Vector2(150, 50), new Vector2(200, 100), Color.Red);
+            
 
             buttonTriangleFilling.OnClick += (b) => menuState = MenuState.TriangleFilling;
-            buttonHalfSpace.OnClick += (b) => { menuState = MenuState.None; scene = new HalfSpace(); scene.BackToMenu += BackToTriangleMenu; };
-            buttonBarycentric.OnClick += (b) => { menuState = MenuState.None; scene = new Barycentric(); scene.BackToMenu += BackToTriangleMenu; };
+            buttonHalfSpace.OnClick += (b) => { menuState = MenuState.None; scene = new HalfSpace(); scene.BackToMenu += BackToMainMenu; };
+            buttonBarycentric.OnClick += (b) => { menuState = MenuState.None; scene = new Barycentric(); scene.BackToMenu += BackToMainMenu; };
         
         
-            buttonClipping.OnClick += (b) => { menuState = MenuState.None; scene = new TriangleClippingScene(); scene.BackToMenu += BackToTriangleMenu; };
+            buttonClipping.OnClick += (b) => { menuState = MenuState.None; scene = new TriangleClippingSH(); scene.BackToMenu += BackToMainMenu; };
         }
 
         protected override void UnloadContent()
@@ -132,6 +134,12 @@ namespace HumanGraphicsPipelineXna
         {
             buttonHalfSpace.Draw(spriteBatch);
             buttonBarycentric.Draw(spriteBatch);
+        }
+
+        private void BackToMainMenu()
+        {
+            scene = null;
+            menuState = MenuState.Main;
         }
 
         // Added to scene object when TriangleScene is created.

@@ -66,9 +66,6 @@ namespace HumanGraphicsPipelineXna
                     side = Side.Up;
                 else if (normalisedPointIn.Y < -1)
                     side = Side.Down;
-
-                int p = 3;
-                p = 5;
             }
 
             
@@ -591,12 +588,12 @@ namespace HumanGraphicsPipelineXna
                             index2 = i;
                     }
 
-                    if (outsideTriPoints[index1].intersectionPointsTo.Count == 0 ||
+                    if (outsideTriPoints[index1].intersectionPointsFrom.Count == 0 ||
                         outsideTriPoints[index2].intersectionPointsTo.Count == 0)
                     {
                         Line l1;
-                        if (!(outsideTriPoints[index1].intersectionPointsFrom[0].X != outsideTriPoints[index2].intersectionPointsTo[0].Y &&
-                            outsideTriPoints[index1].intersectionPointsFrom[0].Y != outsideTriPoints[index2].intersectionPointsTo[0].Y))
+                        if (!(outsideTriPoints[index1].intersectionPointsTo[0].X != outsideTriPoints[index1].intersectionPointsTo[0].Y &&
+                            outsideTriPoints[index2].intersectionPointsFrom[0].Y != outsideTriPoints[index2].intersectionPointsFrom[0].Y))
                             l1 = new Line(outsideTriPoints[index1].intersectionPointsFrom[0], outsideTriPoints[index2].intersectionPointsFrom.Last(), XColour.Green, 2f);
                         else
                             l1 = new Line(outsideTriPoints[index1].intersectionPointsFrom[0], outsideTriPoints[index2].intersectionPointsFrom[0], XColour.Green, 2f);
@@ -630,9 +627,9 @@ namespace HumanGraphicsPipelineXna
                         {
                             Vector2 v;
 
-                            if (outsideTriPoints[index2].intersectionPointsFrom.Last().X == l[i].X ||
-                                outsideTriPoints[index2].intersectionPointsFrom.Last().Y == l[i].Y)
-                                v = outsideTriPoints[index2].intersectionPointsFrom[0];
+                            if (outsideTriPoints[index1].intersectionPointsFrom.Last().X == l[i].X ||
+                                outsideTriPoints[index1].intersectionPointsFrom.Last().Y == l[i].Y)
+                                v = outsideTriPoints[index1].intersectionPointsFrom.Last();
                             else
                                 v = outsideTriPoints[index2].intersectionPointsFrom.Last();
                             Line lX = new Line(l[i], v, col, 2f);
