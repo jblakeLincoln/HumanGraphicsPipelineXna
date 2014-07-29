@@ -78,7 +78,7 @@ namespace HumanGraphicsPipelineXna
         protected override void DerivedInit()
         {
             base.DerivedInit();
-
+            polyList = new List<Polygon>();
             squareList = new List<Square>();
             polygonOutput = null;
         }
@@ -445,11 +445,37 @@ namespace HumanGraphicsPipelineXna
                 pointList.Add(Vec2toPoint(intersectionsC[i]));
 
 
+            List<DColour> dCol = new List<DColour>(){
+                DColour.Red,
+                DColour.Yellow,
+                DColour.Green,
+                DColour.Blue,
+                DColour.White,
+                DColour.Gray,
+                DColour.SlateBlue,
+                DColour.Plum,
+                DColour.Olive,
+            };
             if (pointList.Count > 0)
+            {
                 polygonOutput = new Polygon(pointList, DColour.Green);
+
+                for (int i = 0; i < pointList.Count - 2; i++)
+                { 
+                    List<DPoint> d = new List<DPoint>(){
+                        pointList[0],
+                        pointList[i+1],
+                        pointList[i+2],
+                    };
+                    Polygon p = new Polygon(d, dCol[i]);
+                    polyList.Add(p);
+                }
+            }
+
+
         }
 
-        
+        List<Polygon> polyList;
 
         List<Square> squareList;
         
@@ -470,6 +496,13 @@ namespace HumanGraphicsPipelineXna
 
         public override void Draw(Microsoft.Xna.Framework.Graphics.SpriteBatch spriteBatch)
         {
+           // if (polygonOutput != null)
+           //     polygonOutput.Draw(spriteBatch);
+
+            if (polyList != null)
+                for (int i = 0; i < polyList.Count; i++)
+                    polyList[i].Draw(spriteBatch);
+
             base.Draw(spriteBatch);
 
             lineTop.Draw(spriteBatch);
@@ -479,8 +512,7 @@ namespace HumanGraphicsPipelineXna
 
            
 
-            if (polygonOutput != null)
-                polygonOutput.Draw(spriteBatch);
+            
 
             for (int i = 0; i < squareList.Count; i++)
                 squareList[i].Draw(spriteBatch);
