@@ -81,6 +81,8 @@ namespace HumanGraphicsPipelineXna
             polyList = new List<Polygon>();
             squareList = new List<Square>();
             polygonOutput = null;
+            isOutsideList = new List<bool>();
+            intersectionsLists = new List<List<Vector2>>();
         }
 
         private bool CheckLineIntersection(Vector2 p1, Vector2 p2, Vector2 q1, Vector2 q2, out Vector2 intersectionPoint)
@@ -133,17 +135,8 @@ namespace HumanGraphicsPipelineXna
             return true;
         }
 
-
-        bool isOutsideA = false;
-        bool isOutsideB = false;
-        bool isOutsideC = false;
-        int outsideCount = 0;
-
         List<ClippingPoint> insideTriPoints;
         List<ClippingPoint> outsideTriPoints;
-        List<Vector2> intersectionsC;
-        List<Vector2> intersectionsA;
-        List<Vector2> intersectionsB;
 
 
         protected override void StateChanges(GameTime gameTime)
@@ -151,119 +144,54 @@ namespace HumanGraphicsPipelineXna
             base.StateChanges(gameTime);
             if (Inputs.MouseState.LeftButton == ButtonState.Released && Inputs.MouseStatePrevious.LeftButton == ButtonState.Pressed)
             {
-                if (state <= 3)
+                if (state <= triangleCount)
                 {
                     CorrectNormalisedTriangle(state);
                 }
             }
         }
 
+        List<bool> isOutsideList;
 
+        List<List<Vector2>> intersectionsLists = new List<List<Vector2>>();
         protected override void LastPointPlaced(GameTime gameTime)
         {
-            intersectionsC = new List<Vector2>();
-            intersectionsA = new List<Vector2>();
-            intersectionsB = new List<Vector2>();
-            CorrectNormalisedTriangle(3);
 
-            isOutsideA = (Math.Abs(normalisedTrianglePoints[0].X) >= 1 || Math.Abs(normalisedTrianglePoints[0].Y) >= 1) ? true : false;
-            isOutsideB = (Math.Abs(normalisedTrianglePoints[1].X) >= 1 || Math.Abs(normalisedTrianglePoints[1].Y) >= 1) ? true : false;
-            isOutsideC = (Math.Abs(normalisedTrianglePoints[2].X) >= 1 || Math.Abs(normalisedTrianglePoints[2].Y) >= 1) ? true : false;
+            CorrectNormalisedTriangle(triangleCount);
 
-            Console.WriteLine("A: " + isOutsideA);
-            Console.WriteLine("B: " + isOutsideB);
-            Console.WriteLine("C: " + isOutsideC + "\n");
-
-            outsideCount = 0;
-
+            for (int i = 0; i < triangleCount; i++)
+            {
+                isOutsideList.Add((Math.Abs(normalisedTrianglePoints[i].X) >= 1 || Math.Abs(normalisedTrianglePoints[i].Y) >= 1) ? true : false);
+                intersectionsLists.Add(new List<Vector2>());
+            }
             for (int i = 0; i < 8; i += 2)
             {
                 bool b;
                 Vector2 v;
 
-                b = CheckLineIntersection(trianglePoints[0], trianglePoints[1], l[i], l[i + 1], out v);
-                intersectionsA.Add(v);
+                for (int j = 0; j < triangleCount-1; j++)
+                {
+                    b = CheckLineIntersection(trianglePoints[j], trianglePoints[j + 1], l[i], l[i + 1], out v);
+                    intersectionsLists[j].Add(v);
+                }
 
-                b = CheckLineIntersection(trianglePoints[1], trianglePoints[2], l[i], l[i + 1], out v);
-                intersectionsB.Add(v);
-
-                b = CheckLineIntersection(trianglePoints[2], trianglePoints[0], l[i], l[i + 1], out v);
-                intersectionsC.Add(v);
+                b = CheckLineIntersection(trianglePoints[triangleCount-1], trianglePoints[0], l[i], l[i + 1], out v);
+                intersectionsLists.Last().Add(v);
             }
 
-            intersectionsA = intersectionsA.Distinct().ToList();
-            intersectionsA.Remove(new Vector2(float.NegativeInfinity));
-
-            intersectionsB = intersectionsB.Distinct().ToList();
-            intersectionsB.Remove(new Vector2(float.NegativeInfinity));
-
-            intersectionsC = intersectionsC.Distinct().ToList();
-            intersectionsC.Remove(new Vector2(float.NegativeInfinity));
-
-
-
-            
-
-
-            /*
-            if (intersectionsA.Count > 1)
+            for (int i = 0; i < triangleCount; i++)
             {
-                float d1;
-                float d2;
-                Vector2 v1 = intersectionsA[0];
-                Vector2 v2 = intersectionsA[1];
-                Vector2 t1 = trianglePoints[0];
-                Vector2.Distance(ref v1, ref v2, out d1);
-                Vector2.Distance(ref v1, ref t1, out d2);
-                if (d1 < d2)
-                {
-                    Vector2 temp = intersectionsA[0];
-                    intersectionsA[0] = intersectionsA[1];
-                    intersectionsA[1] = temp;
-                }
+                intersectionsLists[i] = intersectionsLists[i].Distinct().ToList();
+                intersectionsLists[i].Remove(new Vector2(float.NegativeInfinity));
             }
-
-
-            if (intersectionsB.Count > 1)
-            {
-                float d1;
-                float d2;
-                Vector2 v1 = intersectionsB[0];
-                Vector2 v2 = intersectionsB[1];
-                Vector2 t1 = trianglePoints[0];
-                Vector2.Distance(ref v1, ref v2, out d1);
-                Vector2.Distance(ref v1, ref t1, out d2);
-                if (d1 < d2)
-                {
-                    Vector2 temp = intersectionsB[0];
-                    intersectionsB[0] = intersectionsB[1];
-                    intersectionsB[1] = temp;
-                }
-            }
-
-
-            if (intersectionsC.Count > 1)
-            {
-                float d1;
-                float d2;
-                Vector2 v1 = intersectionsC[0];
-                Vector2 v2 = intersectionsC[1];
-                Vector2 t1 = trianglePoints[0];
-                Vector2.Distance(ref v1, ref v2, out d1);
-                Vector2.Distance(ref v1, ref t1, out d2);
-                if (d1 < d2)
-                {
-                    Vector2 temp = intersectionsC[0];
-                    intersectionsC[0] = intersectionsC[1];
-                    intersectionsC[1] = temp;
-                }
-            }*/
 
             insideTriPoints = new List<ClippingPoint>();
             outsideTriPoints = new List<ClippingPoint>();
 
             List<Vector2> tempIntersectionsTo = new List<Vector2>();
             List<Vector2> tempIntersectionsFrom = new List<Vector2>();
+
+            /*
             tempIntersectionsFrom.AddRange(intersectionsA);
             tempIntersectionsTo.AddRange(intersectionsC);
 
@@ -300,9 +228,20 @@ namespace HumanGraphicsPipelineXna
                 outsideTriPoints.Add(clippingC);
             else
                 insideTriPoints.Add(clippingC);
+            */
+
 
             squareList = new List<Square>();
 
+            for (int i = 0; i < triangleCount; i++)
+            {
+                for (int j = 0; j < intersectionsLists[i].Count; j++)
+                {
+                    squareList.Add(new Square(intersectionsLists[i][j], new Vector2(4, 4), XColour.Red));
+                }
+            }
+
+            /*
             for (int i = 0; i < clippingA.intersectionPointsFrom.Count; i++)
                 squareList.Add(new Square(clippingA.intersectionPointsFrom[i], new Vector2(4, 4), XColour.Red));
 
@@ -311,6 +250,7 @@ namespace HumanGraphicsPipelineXna
 
             for (int i = 0; i < clippingC.intersectionPointsFrom.Count; i++)
                 squareList.Add(new Square(clippingC.intersectionPointsFrom[i], new Vector2(4, 4), XColour.Red));
+            */
 
             List<DPoint> pointList = new List<DPoint>();
 
@@ -357,94 +297,119 @@ namespace HumanGraphicsPipelineXna
 
             }*/
 
-            if (intersectionsA.Count > 1)
+            for (int i = 0; i < intersectionsLists.Count; i++)
             {
-                Vector2 one = trianglePoints[0];
-                for (int i = 1; i < intersectionsA.Count; i++)
+                if (intersectionsLists[i].Count > 1)
                 {
-                    Vector2 dist1;
-                    float result1 = 0;
-                    float result2 = 0;
-                    Vector2 check1 = intersectionsA[i-1];
-                    Vector2 check2 = intersectionsA[i];
-                    Vector2.Distance(ref check1, ref one, out result1);
-                    Vector2.Distance(ref check2, ref one, out result2);
-
-                    if (result1 > result2)
+                    Vector2 one = trianglePoints[i];
+                    for (int j = 1; j < intersectionsLists[i].Count; j++)
                     {
-                        Vector2 temp = intersectionsA[i];
-                        intersectionsA[i] = intersectionsA[i - 1];
-                        intersectionsA[i - 1] = temp;
-                        i = 0;
-                    }
+                        float result1 = 0;
+                        float result2 = 0;
+                        Vector2 check1 = intersectionsLists[i][j - 1];
+                        Vector2 check2 = intersectionsLists[i][j];
+                        Vector2.Distance(ref check1, ref one, out result1);
+                        Vector2.Distance(ref check2, ref one, out result2);
 
+                        if (result1 > result2)
+                        {
+                            Vector2 temp = intersectionsLists[i][j];
+                            intersectionsLists[i][j] = intersectionsLists[i][j - 1];
+                            intersectionsLists[i][j - 1] = temp;
+                            j = 0;
+                        }
+                    }
                 }
             }
+            Vector2 lastIntersectionPoint = Vector2.Zero;
+            for (int i = 0; i < isOutsideList.Count; i++)
+            { 
+                if (!isOutsideList[i])
+                    pointList.Add(Vec2toPoint(trianglePoints[i]));
 
-            if (intersectionsB.Count > 1)
-            {
-                Vector2 one = trianglePoints[1];
-                for (int i = 1; i < intersectionsB.Count; i++)
+                
+
+                for (int j = 0; j < intersectionsLists[i].Count; j++)
                 {
-                    Vector2 dist1;
-                    float result1 = 0;
-                    float result2 = 0;
-                    Vector2 check1 = intersectionsB[i - 1];
-                    Vector2 check2 = intersectionsB[i];
-                    Vector2.Distance(ref check1, ref one, out result1);
-                    Vector2.Distance(ref check2, ref one, out result2);
-
-                    if (result1 > result2)
-                    {
-                        Vector2 temp = intersectionsB[i];
-                        intersectionsB[i] = intersectionsB[i - 1];
-                        intersectionsB[i - 1] = temp;
-                        i = 0;
-                    }
-
+                    pointList.Add(Vec2toPoint(intersectionsLists[i][j]));
+                    lastIntersectionPoint = intersectionsLists[i][j];
                 }
+
+                /*
+                if (pointList.Count > 1)
+                {
+                    Vector2 triPoint1 = trianglePoints[i];
+                    Vector2 triPoint2 = (i + 1 < isOutsideList.Count) ? trianglePoints[i + 1] : trianglePoints[0];
+                    for (int j = 0; j < 8; j += 2)
+                    {
+                        bool b = false;
+
+                        
+                        
+                        List<Vector2> vecList = new List<Vector2>(){
+                            PointtoVec2(pointList[pointList.Count-1]),
+                            triPoint1,
+                            triPoint2
+                        };
+                        b = FindPointInPolygon(vecList, l[j]);
+
+                        if (b)
+                        {
+                            DPoint temp = pointList.Last();
+                            //pointList[pointList.Count-1] = Vec2toPoint(l[j]);
+                            pointList.Add(Vec2toPoint(l[j]));
+                        }
+                    }
+                }*/
+
+                if (i >= 1 && lastIntersectionPoint != Vector2.Zero)
+                {
+                    Vector2 triPoint1 = trianglePoints[i];
+                    Vector2 triPoint2 = trianglePoints[i-1];
+                    for (int j = 0; j < 8; j += 2)
+                    {
+                        bool b = false;
+
+                        List<Vector2> vecList = new List<Vector2>(){
+                            lastIntersectionPoint,
+                            triPoint1,
+                            triPoint2
+                        };
+                        b = FindPointInPolygon(vecList, l[j]);
+
+                        if (b)
+                        {
+                            DPoint temp = pointList.Last();
+                            pointList[pointList.Count-1] = Vec2toPoint(l[j]);
+                            pointList.Add(temp);
+                            //pointList.Add(Vec2toPoint(l[j]));
+                        }
+                    }
+                }
+
             }
 
-            if (intersectionsC.Count > 1)
+            Vector2 tp1 = trianglePoints[triangleCount-1];
+            Vector2 tp2 = trianglePoints[0];
+            for (int j = 0; j < 8; j += 2)
             {
-                Vector2 one = trianglePoints[2];
-                for (int i = 1; i < intersectionsC.Count; i++)
+                bool b = false;
+
+                List<Vector2> vecList = new List<Vector2>(){
+                            lastIntersectionPoint,
+                            tp1,
+                            tp2
+                        };
+                b = FindPointInPolygon(vecList, l[j]);
+
+                if (b)
                 {
-                    Vector2 dist1;
-                    float result1 = 0;
-                    float result2 = 0;
-                    Vector2 check1 = intersectionsC[i - 1];
-                    Vector2 check2 = intersectionsC[i];
-                    Vector2.Distance(ref check1, ref one, out result1);
-                    Vector2.Distance(ref check2, ref one, out result2);
-
-                    if (result1 > result2)
-                    {
-                        Vector2 temp = intersectionsC[i];
-                        intersectionsC[i] = intersectionsC[i - 1];
-                        intersectionsC[i - 1] = temp;
-                        i = 0;
-                    }
-
+                    DPoint temp = pointList.Last();
+                    pointList[pointList.Count - 1] = Vec2toPoint(l[j]);
+                    pointList.Add(temp);
+                   // pointList.Add(Vec2toPoint(l[j]));
                 }
             }
-
-            if (!isOutsideA)
-                pointList.Add(Vec2toPoint(trianglePoints[0]));
-            for (int i = 0; i < intersectionsA.Count; i++)
-                pointList.Add(Vec2toPoint(intersectionsA[i]));
-
-            if (!isOutsideB)
-                pointList.Add(Vec2toPoint(trianglePoints[1]));
-            for (int i = 0; i < intersectionsB.Count; i++)
-                pointList.Add(Vec2toPoint(intersectionsB[i]));
-
-            if (!isOutsideC)
-                pointList.Add(Vec2toPoint(trianglePoints[2]));
-            for (int i = 0; i < intersectionsC.Count; i++)
-                pointList.Add(Vec2toPoint(intersectionsC[i]));
-
-
             List<DColour> dCol = new List<DColour>(){
                 DColour.Red,
                 DColour.Yellow,
@@ -452,27 +417,101 @@ namespace HumanGraphicsPipelineXna
                 DColour.Blue,
                 DColour.White,
                 DColour.Gray,
-                DColour.SlateBlue,
+                DColour.CornflowerBlue,
+                DColour.Plum,
+                DColour.Olive,
+                DColour.Red,
+                DColour.Yellow,
+                DColour.Green,
+                DColour.Blue,
+                DColour.White,
+                DColour.Gray,
+                DColour.CornflowerBlue,
+                DColour.Plum,
+                DColour.Olive,
+                DColour.Red,
+                DColour.Yellow,
+                DColour.Green,
+                DColour.Blue,
+                DColour.White,
+                DColour.Gray,
+                DColour.CornflowerBlue,
                 DColour.Plum,
                 DColour.Olive,
             };
+
+
             if (pointList.Count > 0)
             {
                 polygonOutput = new Polygon(pointList, DColour.Green);
 
                 for (int i = 0; i < pointList.Count - 2; i++)
-                { 
+                {
                     List<DPoint> d = new List<DPoint>(){
                         pointList[0],
                         pointList[i+1],
                         pointList[i+2],
                     };
-                    Polygon p = new Polygon(d, dCol[i]);
-                    polyList.Add(p);
+
+                    
+
+                    bool b = FindPointInPolygon(trianglePoints.ToList(), FindCentroidOfTriangle(d));
+
+                    if (b)
+                    {
+                        Polygon p = new Polygon(d, dCol[i]);
+                        polyList.Add(p);
+                    }
                 }
             }
 
+        }
 
+        public Vector2 FindCentroidOfTriangle(List<Vector2> pointsIn)
+        {
+            float centreX = (pointsIn[0].X + pointsIn[1].X + pointsIn[2].X) / 3;
+            float centreY = (pointsIn[0].Y + pointsIn[1].Y + pointsIn[2].Y) / 3;
+
+            return new Vector2(centreX, centreY);
+        }
+
+        public Vector2 FindCentroidOfTriangle(List<DPoint> pointsIn)
+        {
+            float centreX = (pointsIn[0].X + pointsIn[1].X + pointsIn[2].X) / 3;
+            float centreY = (pointsIn[0].Y + pointsIn[1].Y + pointsIn[2].Y) / 3;
+
+            return new Vector2(centreX, centreY);
+        }
+
+        public bool FindPointInPolygon(List<Vector2> points, Vector2 p)
+        {
+            List<float> v = new List<float>();
+            for (int i = 1; i < points.Count; i++)
+            {
+                v.Add(orient2d(points[i - 1], points[i], p));
+            }
+            v.Add(orient2d(points[points.Count - 1], points[0], p));
+
+            bool negative = false;
+
+            if (v[0] < 0)
+                negative = true;
+
+            for (int i = 0; i < v.Count; i++)
+            {
+                if (negative && v[i] >= 0)
+                    return false;
+                else if (!negative && v[i] < 0)
+                    return false;
+            }
+
+
+            return true;
+        }
+
+        private float orient2d(Vector2 a, Vector2 b, Vector2 p) // a = input 1, b = input 2, p = point to check
+        {
+            return (b.X - a.X) * (p.Y - a.Y) - (b.Y - a.Y) * (p.X - a.X);
         }
 
         List<Polygon> polyList;
@@ -487,6 +526,11 @@ namespace HumanGraphicsPipelineXna
         private DPoint Vec2toPoint(Vector2 vecIn)
         {
             return new DPoint((int)vecIn.X, (int)vecIn.Y);
+        }
+
+        private Vector2 PointtoVec2(DPoint pointIn)
+        {
+            return new Vector2((int)pointIn.X, (int)pointIn.Y);
         }
 
         protected override void ActionOnTrianglePlaced(Microsoft.Xna.Framework.Graphics.SpriteBatch spriteBatch)

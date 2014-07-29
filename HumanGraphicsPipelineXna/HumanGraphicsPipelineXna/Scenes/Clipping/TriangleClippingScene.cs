@@ -104,10 +104,10 @@ namespace HumanGraphicsPipelineXna
         {
             base.DerivedInit();
 
-            trianglePoints = new Vector2[3];
-            normalisedTrianglePoints = new Vector2[3];
-            triangleSquares = new Square[3];
-            triangleLines = new Line[3]; //AB, BC, CA
+            trianglePoints = new Vector2[triangleCount];
+            normalisedTrianglePoints = new Vector2[triangleCount];
+            triangleSquares = new Square[triangleCount];
+            triangleLines = new Line[triangleCount]; //AB, BC, CA
 
             intersectionAB1 = false;
             intersectionBC1 = false;

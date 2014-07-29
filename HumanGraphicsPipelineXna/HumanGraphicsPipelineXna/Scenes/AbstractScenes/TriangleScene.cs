@@ -21,6 +21,7 @@ namespace HumanGraphicsPipelineXna
             Animate = 42,
         }
 
+        protected int triangleCount = 12;
         protected Vector2[] trianglePoints;
         protected Vector2[] normalisedTrianglePoints;
         protected Square[] triangleSquares;
@@ -29,10 +30,10 @@ namespace HumanGraphicsPipelineXna
         protected override void DerivedInit()
         {
             state = 0;
-            trianglePoints = new Vector2[3];
-            normalisedTrianglePoints = new Vector2[3];
-            triangleSquares = new Square[3];
-            triangleLines = new Line[3]; //AB, BC, CA
+            trianglePoints = new Vector2[triangleCount];
+            normalisedTrianglePoints = new Vector2[triangleCount];
+            triangleSquares = new Square[triangleCount];
+            triangleLines = new Line[triangleCount]; //AB, BC, CA
 
             
         }
@@ -43,7 +44,7 @@ namespace HumanGraphicsPipelineXna
         {
             if (Inputs.MouseState.LeftButton == ButtonState.Released && Inputs.MouseStatePrevious.LeftButton == ButtonState.Pressed)
             {
-                if (state < 3)
+                if (state < triangleCount)
                 {
                     trianglePoints[(int)state] = new Vector2(Inputs.MouseState.X, Inputs.MouseState.Y);
                     triangleSquares[(int)state] = new Square(new Vector2(Inputs.MouseState.X - 5, Inputs.MouseState.Y - 5), new Vector2(10, 10), Color.Green);
@@ -51,13 +52,16 @@ namespace HumanGraphicsPipelineXna
 
                     state++;
                 }
-                if (state ==3)
+                if (state == triangleCount)
                 {
                     state = 42;
                     LastPointPlaced(gameTime);
-                    triangleLines[0] = new Line(trianglePoints[0], trianglePoints[1], Color.Black, 1);
-                    triangleLines[1] = new Line(trianglePoints[1], trianglePoints[2], Color.Black, 1);
-                    triangleLines[2] = new Line(trianglePoints[2], trianglePoints[0], Color.Black, 1);
+
+                    for (int i = 1; i < triangleCount; i++)
+                    {
+                        triangleLines[i - 1] = new Line(trianglePoints[i - 1], trianglePoints[i], Color.Black, 1f);
+                    }
+                    triangleLines[triangleCount - 1] = new Line(trianglePoints[triangleCount-1], trianglePoints[0], Color.Black, 1);
                 }
             }
         }
@@ -70,7 +74,7 @@ namespace HumanGraphicsPipelineXna
             base.Draw(spriteBatch);
             Vector2 normalisedScreen = Vector2.Normalize(new Vector2(Globals.viewport.X, Globals.viewport.Y));
 
-            for (int i = 0; i < 3; i++)
+            for (int i = 0; i < triangleCount; i++)
             {
                 if (trianglePoints[i] != Vector2.Zero)
                 {
@@ -80,9 +84,9 @@ namespace HumanGraphicsPipelineXna
                 }
             }
 
-            if (trianglePoints[2] != Vector2.Zero)
+            if (trianglePoints[triangleCount-1] != Vector2.Zero)
             {
-                for (int i = 0; i < 3; i++)
+                for (int i = 0; i < triangleCount; i++)
                     triangleLines[i].Draw(spriteBatch);
                 ActionOnTrianglePlaced(spriteBatch);
             }
@@ -95,7 +99,7 @@ namespace HumanGraphicsPipelineXna
             int yPos = 0;
             Fonts.WriteStrokedLine(spriteBatch, Fonts.arial14, "Point A: " + normalisedTrianglePoints[0], new Vector2(10, yPos += 20), Color.White, Color.Black);
             Fonts.WriteStrokedLine(spriteBatch, Fonts.arial14, "Point B: " + normalisedTrianglePoints[1], new Vector2(10, yPos += 20), Color.White, Color.Black);
-            Fonts.WriteStrokedLine(spriteBatch, Fonts.arial14, "Point C: " + normalisedTrianglePoints[2], new Vector2(10, yPos += 20), Color.White, Color.Black);
+            //Fonts.WriteStrokedLine(spriteBatch, Fonts.arial14, "Point C: " + normalisedTrianglePoints[2], new Vector2(10, yPos += 20), Color.White, Color.Black);
 
             if (state == 42)
             {
