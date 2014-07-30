@@ -106,6 +106,9 @@ namespace HumanGraphicsPipelineXna
             new Vector2(int.MinValue, pointBottomLeft.Y), new Vector2(int.MaxValue, pointBottomRight.Y),
             new Vector2(pointTopRight.X, int.MinValue), new Vector2(pointBottomRight.X, int.MaxValue)
             };
+
+
+             linesOutput = new List<Line>();
         }
 
         private bool CheckLineIntersection(Vector2 p1, Vector2 p2, Vector2 q1, Vector2 q2, out Vector2 intersectionPoint)
@@ -399,40 +402,40 @@ namespace HumanGraphicsPipelineXna
 
             pointList = EliminateDuplicates(pointList);
 
-            List<DColour> dCol = new List<DColour>(){
-                DColour.Red,
-                DColour.Yellow,
-                DColour.Green,
-                DColour.Blue,
-                DColour.White,
-                DColour.Gray,
-                DColour.CornflowerBlue,
-                DColour.Plum,
-                DColour.Olive,
-                DColour.Red,
-                DColour.Yellow,
-                DColour.Green,
-                DColour.Blue,
-                DColour.White,
-                DColour.Gray,
-                DColour.CornflowerBlue,
-                DColour.Plum,
-                DColour.Olive,
-                DColour.Red,
-                DColour.Yellow,
-                DColour.Green,
-                DColour.Blue,
-                DColour.White,
-                DColour.Gray,
-                DColour.CornflowerBlue,
-                DColour.Plum,
-                DColour.Olive,
+            List<XColour> dCol = new List<XColour>(){
+                XColour.Red,
+                XColour.Yellow,
+                XColour.Green,
+                XColour.Blue,
+                XColour.White,
+                XColour.Gray,
+                XColour.CornflowerBlue,
+                XColour.Plum,
+                XColour.Olive,
+                XColour.Red,
+                XColour.Yellow,
+                XColour.Green,
+                XColour.Blue,
+                XColour.White,
+                XColour.Gray,
+                XColour.CornflowerBlue,
+                XColour.Plum,
+                XColour.Olive,
+                XColour.Red,
+                XColour.Yellow,
+                XColour.Green,
+                XColour.Blue,
+                XColour.White,
+                XColour.Gray,
+                XColour.CornflowerBlue,
+                XColour.Plum,
+                XColour.Olive,
             };
 
 
             if (pointList.Count > 0)
             {
-                polygonOutput = new Polygon(pointList, DColour.Green);
+               // polygonOutput = new Polygon(pointList, DColour.Green);
 
                 for (int i = 0; i < pointList.Count - 2; i++)
                 {
@@ -441,12 +444,18 @@ namespace HumanGraphicsPipelineXna
                         pointList[i+1],
                         pointList[i+2],
                     };
-                    Polygon p = new Polygon(d, dCol[i]);
-                    polyList.Add(p);
+
+                    linesOutput.Add(new Line(PointtoVec2(pointList[0]), PointtoVec2(pointList[i + 1]), dCol[i], 2f));
+                    linesOutput.Add(new Line(PointtoVec2(pointList[i+1]), PointtoVec2(pointList[i + 2]), dCol[i], 2f));
+                    linesOutput.Add(new Line(PointtoVec2(pointList[i+2]), PointtoVec2(pointList[0]), dCol[i], 2f));
+                    //Polygon p = new Polygon(d, dCol[i]);
+                    //polyList.Add(p);
                 }
             }
 
         }
+
+        List<Line> linesOutput;
 
         public Vector2 FindCentroidOfTriangle(List<Vector2> pointsIn)
         {
@@ -524,11 +533,19 @@ namespace HumanGraphicsPipelineXna
            // if (polygonOutput != null)
            //     polygonOutput.Draw(spriteBatch);
 
-            if (polyList != null)
-                for (int i = 0; i < polyList.Count; i++)
-                    polyList[i].Draw(spriteBatch);
+            //if (polyList != null)
+            //    for (int i = 0; i < polyList.Count; i++)
+            //        polyList[i].Draw(spriteBatch);
+
+
+            
+
 
             base.Draw(spriteBatch);
+
+            if (linesOutput != null)
+                for (int i = 0; i < linesOutput.Count; i++)
+                    linesOutput[i].Draw(spriteBatch);
 
             lineTop.Draw(spriteBatch);
             lineLeft.Draw(spriteBatch);

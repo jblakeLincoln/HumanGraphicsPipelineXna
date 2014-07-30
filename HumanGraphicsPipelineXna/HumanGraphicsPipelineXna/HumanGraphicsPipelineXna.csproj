@@ -81,7 +81,6 @@
     <Compile Include="Scenes\Clipping\TriangleClippingSH.cs" />
     <Compile Include="Scenes\Rasterising\Barycentric.cs" />
     <Compile Include="Objects\Button.cs" />
-    <Compile Include="Scenes\Clipping\TriangleClippingScene.cs" />
     <Compile Include="Scenes\Rasterising\TriangleRasterisingScene.cs" />
     <Compile Include="Static\Fonts.cs" />
     <Compile Include="Static\Globals.cs" />
