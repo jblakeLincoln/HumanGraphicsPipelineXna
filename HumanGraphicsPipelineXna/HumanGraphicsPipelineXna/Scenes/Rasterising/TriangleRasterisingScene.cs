@@ -8,6 +8,7 @@ using Microsoft.Xna.Framework.GamerServices;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Media;
+using DColour = System.Drawing.Color;
 
 namespace HumanGraphicsPipelineXna
 {
@@ -51,6 +52,48 @@ namespace HumanGraphicsPipelineXna
             minimum = new Vector2(minimum.X - (minimum.X % Globals.pixelSize), minimum.Y - (minimum.Y % Globals.pixelSize));
             maximum = new Vector2(maximum.X - (maximum.X % Globals.pixelSize) + Globals.pixelSize, maximum.Y - (maximum.Y % Globals.pixelSize) + Globals.pixelSize);
             boundingBox = new Square(new Vector2(minimum.X, minimum.Y), new Vector2(maximum.X - minimum.X, maximum.Y - minimum.Y), new Color(255, 0, 0, 120));
+
+            List<DColour> dCol = new List<DColour>(){
+                DColour.Red,
+                DColour.Yellow,
+                DColour.Green,
+                DColour.Blue,
+                DColour.White,
+                DColour.Gray,
+                DColour.CornflowerBlue,
+                DColour.Plum,
+                DColour.Olive,
+                DColour.Red,
+                DColour.Yellow,
+                DColour.Green,
+                DColour.Blue,
+                DColour.White,
+                DColour.Gray,
+                DColour.CornflowerBlue,
+                DColour.Plum,
+                DColour.Olive,
+                DColour.Red,
+                DColour.Yellow,
+                DColour.Green,
+                DColour.Blue,
+                DColour.White,
+                DColour.Gray,
+                DColour.CornflowerBlue,
+                DColour.Plum,
+                DColour.Olive,
+            };
+
+            List<List<Vector2>> vecArr = new List<List<Vector2>>();
+
+            vecArr.Add(new List<Vector2>());
+
+            vecArr[0].Add(new Vector2(3f));
+            vecArr[0].Add(new Vector2(3f));
+            vecArr[0].Add(new Vector2(3f));
+            vecArr[0].Add(new Vector2(3f));
+
+
+            vecArr[0] = vecArr[0].Distinct().ToList();
         }
 
         protected override void DrawOnAnimate(SpriteBatch spriteBatch)

@@ -8,7 +8,6 @@ using Microsoft.Xna.Framework.GamerServices;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Media;
-using WF = System.Windows.Forms;
 
 namespace HumanGraphicsPipelineXna
 {
@@ -155,6 +154,7 @@ namespace HumanGraphicsPipelineXna
 
         private void CreateForm()
         {
+            /*
             WF.Control form = WF.Control.FromHandle(Window.Handle);
             
 
@@ -166,6 +166,7 @@ namespace HumanGraphicsPipelineXna
             if (form != null)
                 form.Controls.Add(Globals.panel);
             Globals.panel.Controls.Add(b);
+             * */
         }
     }
 }

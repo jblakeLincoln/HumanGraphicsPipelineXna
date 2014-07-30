@@ -39,16 +39,16 @@ namespace HumanGraphicsPipelineXna
 
         }
 
-        static Vector2 pointTopLeft = new Vector2(Globals.viewportWidth / 6, Globals.viewportHeight / 6);
-        static Vector2 pointTopRight = new Vector2(Globals.viewportWidth - (Globals.viewportWidth / 6), Globals.viewportHeight / 6);
-        static Vector2 pointBottomLeft = new Vector2(Globals.viewportWidth / 6, Globals.viewportHeight - (Globals.viewportHeight / 6));
-        static Vector2 pointBottomRight = new Vector2(Globals.viewportWidth - (Globals.viewportWidth / 6), Globals.viewportHeight - (Globals.viewportHeight / 6));
+        Vector2 pointTopLeft;
+        Vector2 pointTopRight;
+        Vector2 pointBottomLeft;
+        Vector2 pointBottomRight;
 
 
-        Line lineTop = new Line(pointTopLeft, pointTopRight, XColour.Black, 1f);
-        Line lineLeft = new Line(pointTopLeft, pointBottomLeft, XColour.Black, 1f);
-        Line lineBottom = new Line(pointBottomLeft, pointBottomRight, XColour.Black, 1f);
-        Line lineRight = new Line(pointTopRight, pointBottomRight, XColour.Black, 1f);
+        Line lineTop;
+        Line lineLeft;
+        Line lineBottom;
+        Line lineRight;
         /*
         List<Vector2> l = new List<Vector2>() {
             pointTopLeft, pointTopRight, // Top
@@ -56,13 +56,7 @@ namespace HumanGraphicsPipelineXna
             pointBottomRight, pointBottomLeft, // Bottom
             pointTopRight, pointBottomRight}; // Right*/
 
-        List<Vector2> l = new List<Vector2>() {
-            new Vector2(int.MinValue, pointTopLeft.Y), new Vector2(int.MaxValue, pointTopRight.Y),
-            new Vector2(pointBottomLeft.X, int.MinValue), new Vector2(pointTopLeft.X, int.MaxValue),
-            new Vector2(int.MinValue, pointBottomLeft.Y), new Vector2(int.MaxValue, pointBottomRight.Y),
-            new Vector2(pointTopRight.X, int.MinValue), new Vector2(pointBottomRight.X, int.MaxValue)
-        };
-
+        List<Vector2> l;
         ClippingPoint clippingA;
         ClippingPoint clippingB;
         ClippingPoint clippingC;
@@ -89,6 +83,29 @@ namespace HumanGraphicsPipelineXna
             polygonOutput = null;
             isOutsideList = new List<bool>();
             intersectionsLists = new List<List<Vector2>>();
+
+            pointTopLeft = new Vector2(Globals.viewportWidth / 6, Globals.viewportHeight / 6);
+            pointTopRight = new Vector2(Globals.viewportWidth - (Globals.viewportWidth / 6), Globals.viewportHeight / 6);
+            pointBottomLeft = new Vector2(Globals.viewportWidth / 6, Globals.viewportHeight - (Globals.viewportHeight / 6));
+            pointBottomRight = new Vector2(Globals.viewportWidth - (Globals.viewportWidth / 6), Globals.viewportHeight - (Globals.viewportHeight / 6));
+
+            lineTop = new Line(pointTopLeft, pointTopRight, XColour.Black, 1f);
+            lineLeft = new Line(pointTopLeft, pointBottomLeft, XColour.Black, 1f);
+            lineBottom = new Line(pointBottomLeft, pointBottomRight, XColour.Black, 1f);
+            lineRight = new Line(pointTopRight, pointBottomRight, XColour.Black, 1f);
+            /*
+            List<Vector2> l = new List<Vector2>() {
+                pointTopLeft, pointTopRight, // Top
+                pointBottomLeft, pointTopLeft, // Left
+                pointBottomRight, pointBottomLeft, // Bottom
+                pointTopRight, pointBottomRight}; // Right*/
+
+             l = new List<Vector2>() {
+            new Vector2(int.MinValue, pointTopLeft.Y), new Vector2(int.MaxValue, pointTopRight.Y),
+            new Vector2(pointBottomLeft.X, int.MinValue), new Vector2(pointTopLeft.X, int.MaxValue),
+            new Vector2(int.MinValue, pointBottomLeft.Y), new Vector2(int.MaxValue, pointBottomRight.Y),
+            new Vector2(pointTopRight.X, int.MinValue), new Vector2(pointBottomRight.X, int.MaxValue)
+            };
         }
 
         private bool CheckLineIntersection(Vector2 p1, Vector2 p2, Vector2 q1, Vector2 q2, out Vector2 intersectionPoint)
@@ -159,7 +176,22 @@ namespace HumanGraphicsPipelineXna
 
         List<bool> isOutsideList;
 
-        List<List<Vector2>> intersectionsLists = new List<List<Vector2>>();
+        private List<T> EliminateDuplicates<T>(List<T> v)
+        {
+            List<T> temp = new List<T>();
+
+            for (int i = 0; i < v.Count; i++)
+            { 
+                if (!temp.Contains(v[i]))
+                    temp.Add(v[i]);
+
+                
+            }
+
+            return temp;
+        }
+
+        List<List<Vector2>> intersectionsLists;
         protected override void LastPointPlaced(GameTime gameTime)
         {
 
@@ -172,8 +204,8 @@ namespace HumanGraphicsPipelineXna
             }
             for (int i = 0; i < 8; i += 2)
             {
-                bool b;
-                Vector2 v;
+                bool b = false;
+                Vector2 v = Vector2.Zero;
 
                 for (int j = 0; j < triangleCount-1; j++)
                 {
@@ -182,7 +214,7 @@ namespace HumanGraphicsPipelineXna
                 }
 
                 b = CheckLineIntersection(trianglePoints[triangleCount-1], trianglePoints[0], l[i], l[i + 1], out v);
-                intersectionsLists.Last().Add(v);
+                intersectionsLists[intersectionsLists.Count-1].Add(v);
             }
 
             for (int i = 0; i < triangleCount; i++)
@@ -206,7 +238,7 @@ namespace HumanGraphicsPipelineXna
                     }
                 }
 
-                intersectionsLists[i] = intersectionsLists[i].Distinct().ToList();
+                intersectionsLists[i] = EliminateDuplicates(intersectionsLists[i]);
                 intersectionsLists[i].Remove(new Vector2(float.NegativeInfinity));
             }
 
@@ -360,38 +392,12 @@ namespace HumanGraphicsPipelineXna
                 }
                 
 
-                /*
-                if (pointList.Count > 1)
-                {
-                    Vector2 triPoint1 = trianglePoints[i];
-                    Vector2 triPoint2 = (i + 1 < isOutsideList.Count) ? trianglePoints[i + 1] : trianglePoints[0];
-                    for (int j = 0; j < 8; j += 2)
-                    {
-                        bool b = false;
-
-                        
-                        
-                        List<Vector2> vecList = new List<Vector2>(){
-                            PointtoVec2(pointList[pointList.Count-1]),
-                            triPoint1,
-                            triPoint2
-                        };
-                        b = FindPointInPolygon(vecList, l[j]);
-
-                        if (b)
-                        {
-                            DPoint temp = pointList.Last();
-                            //pointList[pointList.Count-1] = Vec2toPoint(l[j]);
-                            pointList.Add(Vec2toPoint(l[j]));
-                        }
-                    }
-                }*/
 
                 
 
             }
 
-            pointList = pointList.Distinct().ToList();
+            pointList = EliminateDuplicates(pointList);
 
             List<DColour> dCol = new List<DColour>(){
                 DColour.Red,
