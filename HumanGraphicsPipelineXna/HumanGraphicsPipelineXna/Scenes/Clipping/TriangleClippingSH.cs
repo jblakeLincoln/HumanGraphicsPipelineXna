@@ -26,24 +26,19 @@ namespace HumanGraphicsPipelineXna
             public List<Vector2> intersectionPointsTo = new List<Vector2>();
             public List<Vector2> intersectionPointsFrom = new List<Vector2>();
             public bool isOutside = false;
-
             void setIsOutside(bool t) { isOutside = t; }
-
             public ClippingPoint(Vector2 triPointIn, Vector2 normalisedPointIn, List<Vector2> intersectionPointsToIn, List<Vector2> intersectionPointsFromIn)
             {
                 intersectionPointsTo = intersectionPointsToIn;
                 intersectionPointsFrom = intersectionPointsFromIn;
                 triPoint = triPointIn;
             }
-
-
         }
 
         Vector2 pointTopLeft;
         Vector2 pointTopRight;
         Vector2 pointBottomLeft;
         Vector2 pointBottomRight;
-
 
         Line lineTop;
         Line lineLeft;
@@ -57,10 +52,13 @@ namespace HumanGraphicsPipelineXna
             pointTopRight, pointBottomRight}; // Right*/
 
         List<Vector2> l;
-        ClippingPoint clippingA;
-        ClippingPoint clippingB;
-        ClippingPoint clippingC;
-
+        List<ClippingPoint> insideTriPoints;
+        List<ClippingPoint> outsideTriPoints;
+        List<Polygon> polyList;
+        List<List<Vector2>> intersectionsLists;
+        List<Square> squareList;
+        List<Line> linesOutput;
+        List<bool> isOutsideList;
         Polygon polygonOutput;
 
         private void CorrectNormalisedTriangle(int state)
@@ -161,10 +159,6 @@ namespace HumanGraphicsPipelineXna
             return true;
         }
 
-        List<ClippingPoint> insideTriPoints;
-        List<ClippingPoint> outsideTriPoints;
-
-
         protected override void StateChanges(GameTime gameTime)
         {
             base.StateChanges(gameTime);
@@ -177,7 +171,7 @@ namespace HumanGraphicsPipelineXna
             }
         }
 
-        List<bool> isOutsideList;
+        
 
         private List<T> EliminateDuplicates<T>(List<T> v)
         {
@@ -194,7 +188,7 @@ namespace HumanGraphicsPipelineXna
             return temp;
         }
 
-        List<List<Vector2>> intersectionsLists;
+        
         protected override void LastPointPlaced(GameTime gameTime)
         {
 
@@ -455,7 +449,7 @@ namespace HumanGraphicsPipelineXna
 
         }
 
-        List<Line> linesOutput;
+       
 
         public Vector2 FindCentroidOfTriangle(List<Vector2> pointsIn)
         {
@@ -504,9 +498,7 @@ namespace HumanGraphicsPipelineXna
             return (b.X - a.X) * (p.Y - a.Y) - (b.Y - a.Y) * (p.X - a.X);
         }
 
-        List<Polygon> polyList;
-
-        List<Square> squareList;
+        
         
         protected override void DrawOnAnimate(Microsoft.Xna.Framework.Graphics.SpriteBatch spriteBatch)
         {
@@ -543,9 +535,8 @@ namespace HumanGraphicsPipelineXna
 
             base.Draw(spriteBatch);
 
-            if (linesOutput != null)
-                for (int i = 0; i < linesOutput.Count; i++)
-                    linesOutput[i].Draw(spriteBatch);
+            for (int i = 0; i < linesOutput.Count; i++)
+                linesOutput[i].Draw(spriteBatch);
 
             lineTop.Draw(spriteBatch);
             lineLeft.Draw(spriteBatch);

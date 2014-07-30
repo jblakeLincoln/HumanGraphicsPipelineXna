@@ -62,8 +62,8 @@ namespace HumanGraphicsPipelineXna
             buttonTriangleFilling = new Button("Triangle\n filling", Fonts.font14, new Vector2(150, 50), new Vector2(Globals.viewportWidth / 2 - 200, Globals.viewportHeight / 2 - 25), Color.Red);
             buttonClipping = new Button("Clipping", Fonts.font14, new Vector2(150, 50), new Vector2(Globals.viewportWidth / 2 + 50, Globals.viewportHeight / 2 - 25), Color.Red);
 
-            buttonHalfSpace = new Button("Half-space", Fonts.font14, new Vector2(150, 50), new Vector2(Globals.viewportWidth/2-200, Globals.viewportHeight/2-25), Color.Red);
-            buttonBarycentric = new Button("Barycentric", Fonts.font14, new Vector2(150, 50), new Vector2(Globals.viewportWidth/2+50, Globals.viewportHeight/2-25), Color.Red);
+            buttonHalfSpace = new Button("Half-space", Fonts.font14, new Vector2(150, 50), new Vector2(Globals.viewportWidth/2-75, Globals.viewportHeight/2-25-50), Color.Red);
+            buttonBarycentric = new Button("Barycentric", Fonts.font14, new Vector2(150, 50), new Vector2(Globals.viewportWidth/2-75, Globals.viewportHeight/2-25+50), Color.Red);
 
             
 
