@@ -16,7 +16,9 @@ namespace HumanGraphicsPipelineXna
     {
 
         private float thresh = 500;
-        private string text;
+        public String text {get; set;}
+
+      
 
         private Vector2 position;
         private Vector2 dimensions;

@@ -70,7 +70,7 @@ namespace HumanGraphicsPipelineXna
         {
             buttonNext = new Button(">", Fonts.font14, new Vector2(30, 30), new Vector2(Globals.viewport.X - 40, Globals.viewport.Y - 70), Color.DarkOliveGreen);
             buttonPrevious = new Button("<", Fonts.font14, new Vector2(30, 30), new Vector2(Globals.viewport.X - 100, Globals.viewport.Y - 70), Color.DarkOliveGreen);
-            buttonPlay = new Button("||", Fonts.font14, new Vector2(30, 30), new Vector2(Globals.viewport.X - 70, Globals.viewport.Y - 70), Color.DarkSlateBlue);
+            buttonPlay = new Button("GO", Fonts.font14, new Vector2(30, 30), new Vector2(Globals.viewport.X - 70, Globals.viewport.Y - 70), Color.DarkSlateBlue);
             buttonReset = new Button("Reset", Fonts.font14, new Vector2(90, 30), new Vector2(Globals.viewport.X - 100, Globals.viewport.Y - 40), Color.DarkGreen);
             buttonBack = new Button("Back", Fonts.font14, new Vector2(90, 30), new Vector2(Globals.viewportWidth - 100, Globals.viewportHeight - 100), Color.DarkRed);
 
@@ -78,9 +78,15 @@ namespace HumanGraphicsPipelineXna
             {
                 animating = !animating;
                 if (!animating)
+                {
+                    buttonPlay.text = "GO";
                     buttonPlay.SetColour(Color.DarkSlateBlue);
+                }
                 else
+                {
+                    buttonPlay.text = "||";
                     buttonPlay.SetColour(Color.DarkSlateGray);
+                }
             };
 
             // Next - incremenent the count if possible.
