@@ -21,7 +21,7 @@ namespace HumanGraphicsPipelineXna
             Animate = 42,
         }
 
-        protected int triangleCount = 3;
+        protected int triangleCount = 12;
         protected Vector2[] trianglePoints;
         protected Vector2[] normalisedTrianglePoints;
         protected Square[] triangleSquares;

@@ -44,11 +44,19 @@ namespace HumanGraphicsPipelineXna
 
         protected override void LastPointPlaced(GameTime gameTime)
         {
+            minimum = new Vector2(int.MaxValue);
+            maximum = new Vector2(int.MinValue);
+            for (int i = 0; i < trianglePoints.Length; i++)
+            {
+                minimum = Vector2.Min(minimum, trianglePoints[i]);
+                maximum = Vector2.Max(maximum, trianglePoints[i]);
+            }
+            /*
             minimum = new Vector2(Math.Min((int)trianglePoints[0].X, Math.Min((int)trianglePoints[1].X, (int)trianglePoints[2].X)),
                         Math.Min((int)trianglePoints[0].Y, Math.Min((int)trianglePoints[1].Y, (int)trianglePoints[2].Y)));
             maximum = new Vector2(Math.Max((int)trianglePoints[0].X, Math.Max((int)trianglePoints[1].X, (int)trianglePoints[2].X)),
                 Math.Max((int)trianglePoints[0].Y, Math.Max((int)trianglePoints[1].Y, (int)trianglePoints[2].Y)));
-
+            */
             minimum = new Vector2(minimum.X - (minimum.X % Globals.pixelSize), minimum.Y - (minimum.Y % Globals.pixelSize));
             maximum = new Vector2(maximum.X - (maximum.X % Globals.pixelSize) + Globals.pixelSize, maximum.Y - (maximum.Y % Globals.pixelSize) + Globals.pixelSize);
             boundingBox = new Square(new Vector2(minimum.X, minimum.Y), new Vector2(maximum.X - minimum.X, maximum.Y - minimum.Y), new Color(255, 0, 0, 120));

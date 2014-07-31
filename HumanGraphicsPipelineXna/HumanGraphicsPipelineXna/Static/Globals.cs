@@ -16,6 +16,7 @@ namespace HumanGraphicsPipelineXna
         public static void Init()
         {
             pixelSize = 20;
+            rand = new Random();
             /*
             panel = new WF.Panel();
             Globals.panel.Dock = WF.DockStyle.Right;
@@ -23,6 +24,7 @@ namespace HumanGraphicsPipelineXna
             //graphics.PreferredBackBufferWidth += panel.Width;
         }
 
+        public static Random rand {get; private set;}
         public static GraphicsDeviceManager graphics { get; set; }
         public static GraphicsDevice graphicsDevice { get { return graphics.GraphicsDevice; } }
         public static Vector2 viewport { get { return new Vector2(graphics.GraphicsDevice.Viewport.Width, graphics.GraphicsDevice.Viewport.Height);} }

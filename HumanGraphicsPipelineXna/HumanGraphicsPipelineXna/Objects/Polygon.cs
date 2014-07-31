@@ -50,6 +50,10 @@ namespace HumanGraphicsPipelineXna
                     maxY = val.Y;
             }
 
+            if (maxX == minX)
+                maxX *= 2;
+            if (maxY == minY)
+                maxY *= 2;
             for (int i = 0; i < points.Count; i++)
             {
                 points[i] = new DPoint(points[i].X - minX, points[i].Y - minY);
