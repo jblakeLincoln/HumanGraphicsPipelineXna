@@ -33,13 +33,19 @@ namespace HumanGraphicsPipelineXna
             trianglePoints = new Vector2[triangleCount];
             normalisedTrianglePoints = new Vector2[triangleCount];
             triangleSquares = new Square[triangleCount];
-            triangleLines = new Line[triangleCount]; //AB, BC, CA
-
-            
+            triangleLines = new Line[triangleCount];
         }
 
+        /// <summary>
+        /// When all points are placed.
+        /// </summary>
+        /// <param name="spriteBatch"></param>
         protected abstract void ActionOnTrianglePlaced(Microsoft.Xna.Framework.Graphics.SpriteBatch spriteBatch);
 
+        /// <summary>
+        /// When a new point is placed.
+        /// </summary>
+        /// <param name="gameTime"></param>
         protected override void StateChanges(GameTime gameTime)
         {
             if (Inputs.MouseState.LeftButton == ButtonState.Released && Inputs.MouseStatePrevious.LeftButton == ButtonState.Pressed)
@@ -99,42 +105,13 @@ namespace HumanGraphicsPipelineXna
             int yPos = 0;
             Fonts.WriteStrokedLine(spriteBatch, Fonts.arial14, "Point A: " + normalisedTrianglePoints[0], new Vector2(10, yPos += 20), Color.White, Color.Black);
             Fonts.WriteStrokedLine(spriteBatch, Fonts.arial14, "Point B: " + normalisedTrianglePoints[1], new Vector2(10, yPos += 20), Color.White, Color.Black);
-            //Fonts.WriteStrokedLine(spriteBatch, Fonts.arial14, "Point C: " + normalisedTrianglePoints[2], new Vector2(10, yPos += 20), Color.White, Color.Black);
+            Fonts.WriteStrokedLine(spriteBatch, Fonts.arial14, "Point C: " + normalisedTrianglePoints[2], new Vector2(10, yPos += 20), Color.White, Color.Black);
 
             if (state == 42)
             {
                 
             }
 
-        }
-
-        // Within a 2D array, find the value prior to the current one (x-1).
-        protected Vector2 GetPreviousValue<T>(Vector2 vIn, List<List<T>> l)
-        {
-            // 1D representation of array
-            int t = (int)(vIn.Y * l[0].Count + vIn.X);
-
-            if (t > 0)
-                t--;
-
-            int xx = 0;
-            int yy = 0;
-
-            // Get 2D representations.
-            yy = (int)(t / l[0].Count);
-            xx = (int)(t % l[0].Count);
-
-            // Correct error if out of bounds.
-            if (xx > l.Count)
-            {
-                xx = 0;
-                yy++;
-            }
-
-            return new Vector2(xx, yy);
-        }
-
-        // Implementation of algorithm by derived class.
-        
+        } 
     }
 }

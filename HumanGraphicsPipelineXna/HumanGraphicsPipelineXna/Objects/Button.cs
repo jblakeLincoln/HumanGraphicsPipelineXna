@@ -14,11 +14,9 @@ namespace HumanGraphicsPipelineXna
 {
     public class Button
     {
-
+        // Long click wait threshold
         private float thresh = 500;
         public String text {get; set;}
-
-      
 
         private Vector2 position;
         private Vector2 dimensions;

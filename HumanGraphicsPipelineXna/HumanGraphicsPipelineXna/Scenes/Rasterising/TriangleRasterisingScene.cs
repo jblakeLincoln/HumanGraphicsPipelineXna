@@ -44,7 +44,8 @@ namespace HumanGraphicsPipelineXna
 
         protected override void LastPointPlaced(GameTime gameTime)
         {
-           /* minimum = new Vector2(int.MaxValue);
+           /* Not supported by JSIL - current min/max will only work for triangles.
+            * minimum = new Vector2(int.MaxValue);
             maximum = new Vector2(int.MinValue);
             for (int i = 0; i < trianglePoints.Length; i++)
             {

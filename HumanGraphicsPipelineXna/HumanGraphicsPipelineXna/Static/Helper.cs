@@ -34,5 +34,31 @@ namespace HumanGraphicsPipelineXna
         {
             return a.X * b.Y - a.Y * b.X;
         }
+
+        // Within a 2D array, find the value prior to the current one (x-1).
+        static public Vector2 GetPreviousValue<T>(Vector2 vIn, List<List<T>> l)
+        {
+            // 1D representation of array
+            int t = (int)(vIn.Y * l[0].Count + vIn.X);
+
+            if (t > 0)
+                t--;
+
+            int xx = 0;
+            int yy = 0;
+
+            // Get 2D representations.
+            yy = (int)(t / l[0].Count);
+            xx = (int)(t % l[0].Count);
+
+            // Correct error if out of bounds.
+            if (xx > l.Count)
+            {
+                xx = 0;
+                yy++;
+            }
+
+            return new Vector2(xx, yy);
+        }
     }
 }

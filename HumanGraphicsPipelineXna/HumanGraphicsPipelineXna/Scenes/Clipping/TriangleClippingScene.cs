@@ -18,7 +18,7 @@ using System.IO;
 
 namespace HumanGraphicsPipelineXna
 {
-    class TriangleClippingSH : TriangleScene
+    class TriangleClippingScene : TriangleScene
     {
 
         // Viewport boundaries
@@ -154,6 +154,10 @@ namespace HumanGraphicsPipelineXna
             return true;
         }
 
+        /// <summary>
+        /// When a new point is placed.
+        /// </summary>
+        /// <param name="gameTime"></param>
         protected override void StateChanges(GameTime gameTime)
         {
             base.StateChanges(gameTime);
@@ -164,6 +168,10 @@ namespace HumanGraphicsPipelineXna
             }
         }
 
+        /// <summary>
+        /// Actions to be performed when the last point is placed.
+        /// </summary>
+        /// <param name="gameTime"></param>
         protected override void LastPointPlaced(GameTime gameTime)
         {
             // Correct normalised point of last point placed.

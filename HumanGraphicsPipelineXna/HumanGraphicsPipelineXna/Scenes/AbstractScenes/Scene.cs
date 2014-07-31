@@ -34,9 +34,21 @@ namespace HumanGraphicsPipelineXna
         public delegate void ThisBackToMenu();
         public event ThisBackToMenu BackToMenu;
 
+        /// <summary>
+        /// Initialisation for derived classes
+        /// </summary>
         protected abstract void DerivedInit();
-        //protected abstract void ActionOnTriangleDraw(SpriteBatch spriteBatch);
+
+        /// <summary>
+        /// Occurs when the last polygon point has been placed.
+        /// </summary>
+        /// <param name="gameTime"></param>
         protected abstract void LastPointPlaced(GameTime gameTime);
+
+        /// <summary>
+        /// Occurs when a point has been placed.
+        /// </summary>
+        /// <param name="gameTime"></param>
         protected abstract void StateChanges(GameTime gameTime);
 
         public Scene()
