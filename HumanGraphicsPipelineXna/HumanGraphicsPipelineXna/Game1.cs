@@ -29,7 +29,7 @@ namespace HumanGraphicsPipelineXna
             Clipping,
             None,
         }
-        MenuState menuState = MenuState.Main;
+        MenuState menuState = MenuState.TriangleFilling;
 
         public Game1()
         {
@@ -68,8 +68,8 @@ namespace HumanGraphicsPipelineXna
             
 
             buttonTriangleFilling.OnClick += (b) => menuState = MenuState.TriangleFilling;
-            buttonHalfSpace.OnClick += (b) => { menuState = MenuState.None; scene = new HalfSpace(); scene.BackToMenu += BackToMainMenu; };
-            buttonBarycentric.OnClick += (b) => { menuState = MenuState.None; scene = new Barycentric(); scene.BackToMenu += BackToMainMenu; };
+            buttonHalfSpace.OnClick += (b) => { menuState = MenuState.None; scene = new HalfSpace(); scene.BackToMenu += BackToTriangleMenu; };
+            buttonBarycentric.OnClick += (b) => { menuState = MenuState.None; scene = new Barycentric(); scene.BackToMenu += BackToTriangleMenu; };
         
         
             buttonClipping.OnClick += (b) => { menuState = MenuState.None; scene = new TriangleClippingSH(); scene.BackToMenu += BackToMainMenu; };

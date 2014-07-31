@@ -108,13 +108,14 @@ namespace HumanGraphicsPipelineXna
         {
             StateChanges(gameTime);
 
+            buttonReset.Update(gameTime);
+            buttonBack.Update(gameTime);
+
             if (state == 42)
             {
                 buttonPlay.Update(gameTime);
                 buttonNext.Update(gameTime);
                 buttonPrevious.Update(gameTime);
-                buttonReset.Update(gameTime);
-                buttonBack.Update(gameTime);
             }
 
             if (animating && animationCounter < animationCounterLimit)
