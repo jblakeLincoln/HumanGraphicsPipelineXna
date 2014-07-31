@@ -72,7 +72,7 @@ namespace HumanGraphicsPipelineXna
             buttonBarycentric.OnClick += (b) => { menuState = MenuState.None; scene = new Barycentric(); scene.BackToMenu += BackToTriangleMenu; };
         
         
-            buttonClipping.OnClick += (b) => { menuState = MenuState.None; scene = new TriangleClippingSH(); scene.BackToMenu += BackToMainMenu; };
+            buttonClipping.OnClick += (b) => { menuState = MenuState.None; scene = new TriangleClippingScene(); scene.BackToMenu += BackToMainMenu; };
         }
 
         protected override void UnloadContent()
